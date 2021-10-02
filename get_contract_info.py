@@ -9,7 +9,7 @@ url = "https://intersight.com/api/v1/asset/DeviceContractInformations?$select=Co
 # Create an AUTH object
 AUTH = IntersightAuth(
     secret_key_filename="./SecretKey.txt",
-    api_key_id="5bc128dd37636d3874c4c9ce/5bc1285d37636d3874c4bea2/611f4e547564612d303c6cc7",
+    api_key_id="xxxxxxxxxxx",
 )
 
 payload = {}
