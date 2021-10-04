@@ -387,7 +387,7 @@ def main():
     # Get Server Moid's where the Server license is not Base.
     server_license_info = get_server_license_info(AUTH)
     license_dict = parse_license_info(server_license_info)
-    print(license_dict)
+    # print(license_dict)
     server_moid_list = []
     for moid in license_dict.keys():
         server_moid_list.append(moid)
@@ -395,10 +395,10 @@ def main():
     server_moid_tuple = tuple(server_moid_list)
     # Server Info in server_info list
     server_info = get_server_info(AUTH, server_moid_tuple)
-    print(75 * "-")
-    print("Got Server Info")
-    pprint(server_info)
-    print(75 * "-")
+    # print(75 * "-")
+    # print("Got Server Info")
+    # pprint(server_info)
+    # print(75 * "-")
     moid_list = []
     for server in range(len(server_info)):
         for moid in range(len(server_info[server]["Details"])):
@@ -406,9 +406,9 @@ def main():
 
     moid_tuple = tuple(moid_list)
     # print(75 * "-")
-    print("Moid Tuple")
-    pprint(moid_tuple)
-    print(75 * "-")
+    # print("Moid Tuple")
+    # pprint(moid_tuple)
+    # print(75 * "-")
 
     hcl_info = get_hcl_info(moid_tuple, AUTH)
     # print(75 * "-")
