@@ -12,6 +12,16 @@ Contract,Contract.ContractNumber,Contract.LineStatus,ContractStatus,ContractStat
 **Output**: This script should generate a contract_info.csv file. 
 
 
+**Script Name**: `get_hcl_status.py` : 
+Get's Device related details including NIC/Storage drivers and other details. 
+
+`Note`: 
+Use $top and $skip to return the output in batches if the server count exceeds 500 as the amount of data returned would be huge. 
+Update the .env with the api_key_id to use this script. 
+
+**Output**: This script should generate a hcl_status_info.csv file.
+
+
 ### How to use the provided scripts: 
 1. Clone this repo: git clone https://github.com/sandkum5/intersight-scripts.git
 2. Change directory to intersight-scripts
