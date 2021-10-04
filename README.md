@@ -11,6 +11,7 @@ Contract,Contract.ContractNumber,Contract.LineStatus,ContractStatus,ContractStat
 
 **Output**: This script should generate a contract_info.csv file. 
 
+--- 
 
 **Script Name**: `get_hcl_status.py` : 
 Get's Device related details including NIC/Storage drivers and other details. 
