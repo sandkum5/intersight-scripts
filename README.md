@@ -3,6 +3,7 @@
 
 `Note`: I have copied the intersight_auth.py from github repo: https://github.com/movinalot/intersight-rest-api
 
+--- 
 **Script Name**: `get_contract_info.py` : 
 Get following feilds for all the devices in the account and write to a CSV file: 
 Contract,Contract.ContractNumber,Contract.LineStatus,ContractStatus,ContractStatusReason,ServiceDescription,ServiceLevel,ServiceStartDate,ServiceEndDate,SalesOrderNumber,PurchaseOrderNumber,PlatformType,DeviceType,DeviceId
@@ -12,7 +13,6 @@ Contract,Contract.ContractNumber,Contract.LineStatus,ContractStatus,ContractStat
 **Output**: This script should generate a contract_info.csv file. 
 
 --- 
-
 **Script Name**: `get_hcl_status.py` : 
 Get's Device related details including NIC/Storage drivers and other details. 
 
@@ -22,7 +22,7 @@ Update the .env with the api_key_id to use this script.
 
 **Output**: This script should generate a hcl_status_info.csv file.
 
-
+--- 
 ### How to use the provided scripts: 
 1. Clone this repo: git clone https://github.com/sandkum5/intersight-scripts.git
 2. Change directory to intersight-scripts
