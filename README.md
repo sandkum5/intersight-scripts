@@ -20,8 +20,6 @@ Get's Device related details including NIC/Storage drivers and other details.
 Use $top and $skip to return the output in batches if the server count exceeds 500 as the amount of data returned would be huge. 
 Update the .env with the api_key_id to use this script. 
 
-**Caveat**: This will only work when all the servers are at Essential or Above license level. If any server is at Base license level, this will result in an error. 
-
 **Output**: This script should generate a hcl_status_info.csv file.
 
 --- 
