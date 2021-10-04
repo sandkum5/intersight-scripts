@@ -10,9 +10,43 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def get_server_info(AUTH):
+def get_server_license_info(AUTH):
     """Get's all the server info"""
-    url = "https://intersight.com/api/v1/cond/HclStatuses?$expand=RegisteredDevice($select=Moid,Serial,DeviceHostname,DeviceIpAddress)&$select=ManagedObject,ComponentStatus,HardwareStatus,HclFirmwareVersion,HclModel,HclOsVendor,HclOsVersion,HclProcessor,InvFirmwareVersion,InvModel,InvOsVendor,InvOsVersion,InvProcessor,ServerReason,SoftwareStatus,Status,Details,RegisteredDevice"
+    url = "https://intersight.com/api/v1/compute/RackUnits?$select=Serial,Tags"
+    payload = {}
+    headers = {}
+    response = requests.request("GET", url, auth=AUTH, headers=headers, data=payload)
+    server_info = response.json()["Results"]
+    return server_info
+
+
+def parse_license_info(server_info):
+    license_dict = {}
+    for server in server_info:
+        for tag in server["Tags"]:
+            if "Intersight.LicenseTier" in tag["Key"]:
+                license = tag["Value"]
+        moid = server["Moid"]
+        serial = server["Serial"]
+        object_type = server["ObjectType"]
+        if license != "Base":
+            license_dict[moid] = {
+                "Serial": serial,
+                "ObjectType": object_type,
+                "License": license,
+            }
+        # print("")
+        # print(f"Server Serial: {serial}\nServer Moid: {moid}\nServer ObjectType: {object_type}\nServer License: {license}")
+        # print(100 * "-")
+    return license_dict
+
+
+def get_server_info(AUTH, server_moid_tuple):
+    """Get's all the server info"""
+    base_url = f"https://intersight.com/api/v1/cond/HclStatuses?"
+    filter_url = f"$filter=(ManagedObject.Moid in {server_moid_tuple})"
+    expand_filter = f"&$expand=ManagedObject($select=Tags),RegisteredDevice($select=Moid,Serial,DeviceHostname,DeviceIpAddress)&$select=ManagedObject,ComponentStatus,HardwareStatus,HclFirmwareVersion,HclModel,HclOsVendor,HclOsVersion,HclProcessor,InvFirmwareVersion,InvModel,InvOsVendor,InvOsVersion,InvProcessor,ServerReason,SoftwareStatus,Status,Details,RegisteredDevice"
+    url = f"{base_url}{filter_url}{expand_filter}"
     payload = {}
     headers = {}
     response = requests.request("GET", url, auth=AUTH, headers=headers, data=payload)
@@ -350,12 +384,21 @@ def main():
         api_key_id=os.getenv("api_key_id"),
     )
 
+    # Get Server Moid's where the Server license is not Base.
+    server_license_info = get_server_license_info(AUTH)
+    license_dict = parse_license_info(server_license_info)
+    print(license_dict)
+    server_moid_list = []
+    for moid in license_dict.keys():
+        server_moid_list.append(moid)
+
+    server_moid_tuple = tuple(server_moid_list)
     # Server Info in server_info list
-    server_info = get_server_info(AUTH)
-    # print(75 * "-")
-    # print("Got Server Info")
-    # pprint(server_info)
-    # print(75 * "-")
+    server_info = get_server_info(AUTH, server_moid_tuple)
+    print(75 * "-")
+    print("Got Server Info")
+    pprint(server_info)
+    print(75 * "-")
     moid_list = []
     for server in range(len(server_info)):
         for moid in range(len(server_info[server]["Details"])):
@@ -363,9 +406,9 @@ def main():
 
     moid_tuple = tuple(moid_list)
     # print(75 * "-")
-    # print("Moid Tuple")
-    # pprint(moid_tuple)
-    # print(75 * "-")
+    print("Moid Tuple")
+    pprint(moid_tuple)
+    print(75 * "-")
 
     hcl_info = get_hcl_info(moid_tuple, AUTH)
     # print(75 * "-")
@@ -374,7 +417,6 @@ def main():
     # print(75 * "-")
 
     component_moid_dict = get_component_moid_dict(hcl_info)
-
     server_dict = parse_server_info(server_info)
     hcl_dict = parse_hcl_info(hcl_info)
     component_dict = parse_component_moid_dict(component_moid_dict, AUTH)
