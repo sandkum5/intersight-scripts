@@ -12,7 +12,7 @@ load_dotenv()
 
 def get_server_license_info(AUTH):
     """Get's all the server info"""
-    url = "https://intersight.com/api/v1/compute/RackUnits?$select=Serial,Tags"
+    url = "https://intersight.com/api/v1/compute/PhysicalSummaries?$select=Serial,Tags"
     payload = {}
     headers = {}
     response = requests.request("GET", url, auth=AUTH, headers=headers, data=payload)
