@@ -30,7 +30,8 @@ Create/list below objects in Terraform Cloud using Terraform Cloud API through I
   3. Create Workspace Variables
   4. List Workspace Variables
  
-`tfcloud_workspace_vars.json` : var file to create variables in terraform cloud
+`tfcloud_data.json` : Json file for tfcloud related data
+`.env`: Add Intersight api_key_id in this file
 
 --- 
 ### How to use the provided scripts: 
