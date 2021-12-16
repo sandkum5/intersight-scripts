@@ -1,0 +1,14 @@
+[
+    {
+        "key": "org_name",
+        "value": "default",
+        "description": "This is a API Created org variable",
+        "category": "terraform"
+    },
+    {
+        "key": "Name",
+        "value": "tfcloud_ntp1",
+        "description": "This is a API Created Name variable",
+        "category": "terraform"
+    }
+]
