@@ -128,17 +128,24 @@ def main():
     print(workspace_data)
 
     # Create Workspace Vars or load from a json file
-    var_list = [
-        {
-            "key": "org_name",
-            "value": "default",
-            "description": "This is a API Created org variable",
-            "category": "terraform",  # Possible Values: "terraform", "env"
-        }
-    ]
+    # var_list = [
+    #     {
+    #         "key": "org_name",
+    #         "value": "default",
+    #         "description": "This is a API Created org variable",
+    #         "category": "terraform",  # Possible Values: "terraform", "env"
+    #     }
+    # ]
 
     # Set workspace ID for which we are creating variables
     workspace_id = "<add_workspace_id>"
+    
+    # Load workspace variables from a file
+    variable_file = "tfcloud_vars.json"
+    with open(variable_file, "r") as file:
+        var_list = json.load(file)
+
+    # Create workspace variables from the var_list
     for var in var_list:
         payload = {
             "data": {
