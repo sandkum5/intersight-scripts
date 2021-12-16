@@ -22,16 +22,40 @@
     },
     "vars": [
         {
+            "key": "Name",
+            "value": "default",
+            "description": "This is a API Created org variable",
+            "category": "terraform"
+        },
+        {
+            "key": "Enabled",
+            "value": "true",
+            "description": "This is a API Created Name variable",
+            "category": "terraform"
+        },
+        {
+            "key": "NtpServers",
+            "value": "["1.1.1.1", "2.2.2.2"]",
+            "description": "This is a API Created org variable",
+            "category": "terraform"
+        },
+        {
+            "key": "TimeZone",
+            "value": "America/Los_Angeles",
+            "description": "This is a API Created Name variable",
+            "category": "terraform"
+        },
+        {
             "key": "org_name",
             "value": "default",
             "description": "This is a API Created org variable",
             "category": "terraform"
         },
         {
-            "key": "Name",
-            "value": "tfcloud_ntp1",
+            "key": "Description",
+            "value": "IST DEMO NTP1 vars using github",
             "description": "This is a API Created Name variable",
             "category": "terraform"
-        }
+        }     
     ]
 }
