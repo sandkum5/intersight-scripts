@@ -90,6 +90,9 @@ def get_workspace(auth, tfcloud_org):
 
 
 def get_workspace_vars(auth, workspace_id):
+    """
+    Function to get variables created in a workspace
+    """
     headers = {"Content-Type": "application/json"}
     url = f"https://intersight.com/tfc/api/v2/workspaces/{workspace_id}/vars"
     response = requests.get(url, headers=headers, auth=auth)
@@ -141,6 +144,10 @@ def main():
     var_list = data["vars"]
     # Create variables defined in tfcloud_vars.json file
     create_workspace_vars(auth, workspace_id, var_list)
+    
+    # Print Workspace Variables
+    # workspace_vars = get_workspace_vars(auth, workspace_id)
+    # print("Workspace Variables: ", workspace_vars)
 
 
 if __name__ == "__main__":
