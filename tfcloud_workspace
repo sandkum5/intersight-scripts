@@ -9,48 +9,45 @@ import requests
 from intersight_auth import IntersightAuth
 
 
-def get_workspace(tfcloud_org):
+def get_workspace(tfcloud_org, auth):
     """
     Function to list workspaces under an Organization
     """
-    AUTH = IntersightAuth(
-        secret_key_filename="./SecretKey.txt",
-        api_key_id="<add_api_key_id>",
-    )
     headers = {"Content-Type": "application/json"}
     url = f"https://intersight.com/tfc/api/v2/organizations/{tfcloud_org}/workspaces"
     response = requests.get(
         url,
         headers=headers,
-        auth=AUTH,
+        auth=auth,
     )
     print(response.json)
 
 
-def create_workspace(tfcloud_org, payload):
+def create_workspace(tfcloud_org, auth, payload):
     """
     Function to create a workspace under the provided organization
     """
-    AUTH = IntersightAuth(
-        secret_key_filename="./SecretKey.txt",
-        api_key_id="<add_api_key_id>",
-    )
+
     headers = {"Content-Type": "application/json"}
     url = f"https://intersight.com/tfc/api/v2/organizations/{tfcloud_org}/workspaces"
     response = requests.post(
         url,
         headers=headers,
         data=json.dumps(payload),
-        auth=AUTH,
+        auth=auth,
     )
     print(response.json)
 
 
 def main():
+    auth = IntersightAuth(
+        secret_key_filename="./SecretKey.txt",
+        api_key_id="<add_api_key_id>",
+    )
     tfcloud_org = "<add_tfcloud_org_name>"
 
     # List workspaces
-    get_workspace(tfcloud_org)
+    get_workspace(tfcloud_org, auth)
 
     # Payload to create a Base workspace
     payload_base = {
@@ -84,7 +81,7 @@ def main():
             "type": "workspaces",
         }
     }
-    create_workspace(tfcloud_org, payload_vcs)
+    create_workspace(tfcloud_org, auth, payload_vcs)
 
 
 if __name__ == "__main__":
