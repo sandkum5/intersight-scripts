@@ -2,18 +2,22 @@
 
 """
 Python program to create/list below objects in Terraform Cloud using Terraform Cloud API through Intersight Reverse Proxy APIs
-  1. Create Workspaces
-  2. List Workspace Names and ID's
-  3. Create Workspace Variables
-  4. List Workspace Variables
+    1. Create Workspaces
+    2. List Workspace Names and ID's
+    3. Create Workspace Variables
+    4. List Workspace Variables
 """
+import os
 import json
 import requests
 
 from intersight_auth import IntersightAuth
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
-def create_workspace(tfcloud_org, auth, payload):
+def create_workspace(auth, tfcloud_org, payload):
     """
     Function to create a workspace under the provided organization
     """
@@ -27,8 +31,8 @@ def create_workspace(tfcloud_org, auth, payload):
     )
     print(f"Workspace Create Status: {response.status_code}")
 
-    
-def create_workspace_var(workspace_id, auth, payload):
+
+def create_workspace_var(auth, workspace_id, payload):
     """
     Function to create variables under workspaces
     """
@@ -42,11 +46,11 @@ def create_workspace_var(workspace_id, auth, payload):
     )
     print(f"Workspace Variable Create Status: {response.status_code}")
 
-    
-def create_workspace_vars(variable_file, workspace_id, auth):
-    with open(variable_file, "r") as file:
-        var_list = json.load(file)
 
+def create_workspace_vars(auth, workspace_id, var_list):
+    """
+    Function to create multiple variables in a workspace
+    """
     for var in var_list:
         payload = {
             "data": {
@@ -63,10 +67,10 @@ def create_workspace_vars(variable_file, workspace_id, auth):
         }
         var_name = payload["data"]["attributes"]["key"]
         print(f"Creating WorkSpace Var: {var_name}")
-        create_workspace_var(workspace_id, auth, payload)
+        create_workspace_var(auth, workspace_id, payload)
 
 
-def get_workspace(tfcloud_org, auth):
+def get_workspace(auth, tfcloud_org):
     """
     Function to list workspaces under an Organization
     """
@@ -85,11 +89,12 @@ def get_workspace(tfcloud_org, auth):
     return workspace_data
 
 
-def get_workspace_vars(workspace_id, auth):
+def get_workspace_vars(auth, workspace_id):
     headers = {"Content-Type": "application/json"}
     url = f"https://intersight.com/tfc/api/v2/workspaces/{workspace_id}/vars"
     response = requests.get(url, headers=headers, auth=auth)
     response_data = response.json()
+    print(response_data)
     workspace_vars = {}
     for var in response_data["data"]:
         var_id = var["id"]
@@ -102,78 +107,40 @@ def get_workspace_vars(workspace_id, auth):
 
 
 def main():
-
+    """
+    Main Function to execute the code
+    """
     auth = IntersightAuth(
         secret_key_filename="./SecretKey.txt",
-        api_key_id="<add_api_key_id>",
+        api_key_id=os.getenv("api_key_id"),
     )
 
+    variable_file = "tfcloud_vars.json"
+    with open(variable_file, "r") as file:
+        data = json.load(file)
+
     # Set Organization Name
-    tfcloud_org = "<tf_cloud_organization>"
+    tfcloud_org = data["organization"]
 
-    # Payload to create a Base workspace
-    # payload_base = {
-    #     "data": {
-    #         "attributes": {
-    #             "name": "TF-DEMO_2",
-    #             "resource-count": 1,
-    #             "terraform_version": "",
-    #             "working-directory": "",
-    #         },
-    #         "type": "workspaces",
-    #     }
-    # }
+    # Set Workspace Payload
+    payload_vcs = data["workspace"]["payload_vcs"]
 
-    # Payload to create a workspace with vcs repo, exection mode, auto-apply, tf version settings
-    payload_vcs = {
-        "data": {
-            "attributes": {
-                "name": "tf-demo-cross-launch",
-                "resource-count": 1,
-                "terraform_version": "1.1.1",
-                "working-directory": "",
-                "execution-mode": "remote",
-                "auto-apply": False,
-                "vcs-repo": {
-                    "identifier": "repo_name", # Sample: sandkum5/IST-DEMO"
-                    "oauth-token-id": "<add_github_token>",
-                    "branch": "",
-                },
-            },
-            "type": "workspaces",
-        }
-    }
     # Create Workspace
     workspace_name = payload_vcs["data"]["attributes"]["name"]
     print(f"Creating workspace: {workspace_name}")
-    create_workspace(tfcloud_org, auth, payload_vcs)
-
+    create_workspace(auth, tfcloud_org, payload_vcs)
     # List workspaces
-    workspace_data = get_workspace(tfcloud_org, auth)
-    # print(workspace_data)
-
-    # Create Workspace Vars or load from a json file
-    # var_list = [
-    #     {
-    #         "key": "org_name",
-    #         "value": "default",
-    #         "description": "This is a API Created org variable",
-    #         "category": "terraform",  # Possible Values: "terraform", "env"
-    #     }
-    # ]
+    workspace_data = get_workspace(auth, tfcloud_org)
 
     # Set workspace ID for which we are creating variables
     for key, value in workspace_data.items():
         if value == payload_vcs["data"]["attributes"]["name"]:
             workspace_id = key
-    
-    # Load workspace variables from a file
-    variable_file = "tfcloud_vars.json"
-    with open(variable_file, "r") as file:
-        var_list = json.load(file)
 
-    # Create workspace variables from the var_list
-    create_workspace_vars(variable_file, workspace_id, auth)
+    # Set Variables Payload
+    var_list = data["vars"]
+    # Create variables defined in tfcloud_vars.json file
+    create_workspace_vars(auth, workspace_id, var_list)
 
 
 if __name__ == "__main__":
