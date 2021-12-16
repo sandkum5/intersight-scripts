@@ -22,6 +22,16 @@ Update the .env with the api_key_id to use this script.
 
 **Output**: This script should generate a hcl_status_info.csv file.
 
+---
+**Script Name**: `tfcloud_workspace.py` :
+Create/list below objects in Terraform Cloud using Terraform Cloud API through Intersight Reverse Proxy APIs
+  1. Create Workspaces
+  2. List Workspace Names and ID's
+  3. Create Workspace Variables
+  4. List Workspace Variables
+ 
+`tfcloud_workspace_vars.json` : var file to create variables in terraform cloud
+
 --- 
 ### How to use the provided scripts: 
 1. Clone this repo: git clone https://github.com/sandkum5/intersight-scripts.git
