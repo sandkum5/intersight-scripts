@@ -138,7 +138,9 @@ def main():
     # ]
 
     # Set workspace ID for which we are creating variables
-    workspace_id = "<add_workspace_id>"
+    for key, value in workspace_data.items():
+        if value == payload_vcs["data"]["attributes"]["name"]:
+            workspace_id = key
     
     # Load workspace variables from a file
     variable_file = "tfcloud_vars.json"
