@@ -35,7 +35,7 @@
         },
         {
             "key": "NtpServers",
-            "value": "['1.1.1.1', '2.2.2.2']",
+            "value": '["1.1.1.1", "2.2.2.2"]',
             "description": "This is a API Created org variable",
             "category": "terraform"
         },
