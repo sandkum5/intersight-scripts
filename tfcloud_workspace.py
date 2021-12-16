@@ -25,10 +25,10 @@ def create_workspace(tfcloud_org, auth, payload):
         data=json.dumps(payload),
         auth=auth,
     )
-    print(response.status_code)
+    print(f"Workspace Create Status: {response.status_code}")
 
-
-def create_workspace_vars(workspace_id, auth, payload):
+    
+def create_workspace_var(workspace_id, auth, payload):
     """
     Function to create variables under workspaces
     """
@@ -40,7 +40,30 @@ def create_workspace_vars(workspace_id, auth, payload):
         data=json.dumps(payload),
         auth=auth,
     )
-    print(response.status_code)
+    print(f"Workspace Variable Create Status: {response.status_code}")
+
+    
+def create_workspace_vars(variable_file, workspace_id, auth):
+    with open(variable_file, "r") as file:
+        var_list = json.load(file)
+
+    for var in var_list:
+        payload = {
+            "data": {
+                "type": "vars",
+                "attributes": {
+                    "key": var["key"],
+                    "value": var["value"],
+                    "description": var["description"],
+                    "category": var["category"],
+                    "hcl": False,
+                    "sensitive": False,
+                },
+            }
+        }
+        var_name = payload["data"]["attributes"]["key"]
+        print(f"Creating WorkSpace Var: {var_name}")
+        create_workspace_var(workspace_id, auth, payload)
 
 
 def get_workspace(tfcloud_org, auth):
@@ -89,17 +112,17 @@ def main():
     tfcloud_org = "<tf_cloud_organization>"
 
     # Payload to create a Base workspace
-    payload_base = {
-        "data": {
-            "attributes": {
-                "name": "TF-DEMO_2",
-                "resource-count": 1,
-                "terraform_version": "",
-                "working-directory": "",
-            },
-            "type": "workspaces",
-        }
-    }
+    # payload_base = {
+    #     "data": {
+    #         "attributes": {
+    #             "name": "TF-DEMO_2",
+    #             "resource-count": 1,
+    #             "terraform_version": "",
+    #             "working-directory": "",
+    #         },
+    #         "type": "workspaces",
+    #     }
+    # }
 
     # Payload to create a workspace with vcs repo, exection mode, auto-apply, tf version settings
     payload_vcs = {
@@ -121,11 +144,13 @@ def main():
         }
     }
     # Create Workspace
+    workspace_name = payload_vcs["data"]["attributes"]["name"]
+    print(f"Creating workspace: {workspace_name}")
     create_workspace(tfcloud_org, auth, payload_vcs)
 
     # List workspaces
     workspace_data = get_workspace(tfcloud_org, auth)
-    print(workspace_data)
+    # print(workspace_data)
 
     # Create Workspace Vars or load from a json file
     # var_list = [
@@ -148,25 +173,7 @@ def main():
         var_list = json.load(file)
 
     # Create workspace variables from the var_list
-    for var in var_list:
-        payload = {
-            "data": {
-                "type": "vars",
-                "attributes": {
-                    "key": var["key"],
-                    "value": var["value"],
-                    "description": var["description"],
-                    "category": var["category"],
-                    "hcl": False,
-                    "sensitive": False,
-                },
-            }
-        }
-        create_workspace_vars(workspace_id, auth, payload)
-
-    # Print Workspace vars
-    workspace_vars = get_workspace_vars(workspace_id, auth)
-    print(workspace_vars)
+    create_workspace_vars(variable_file, workspace_id, auth)
 
 
 if __name__ == "__main__":
