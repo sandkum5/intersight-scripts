@@ -1,14 +1,37 @@
-[
-    {
-        "key": "org_name",
-        "value": "default",
-        "description": "This is a API Created org variable",
-        "category": "terraform"
+{
+    "organization": "<update_org_name>",
+    "workspace": {
+        "payload_vcs": {
+            "data": {
+                "attributes": {
+                    "name": "<add_workspace_name>",
+                    "resource-count": 1,
+                    "terraform_version": "1.1.1",
+                    "working-directory": "",
+                    "execution-mode": "remote",
+                    "auto-apply": false,
+                    "vcs-repo": {
+                        "identifier": "<add_git_repo: userid/repo_name format>",
+                        "oauth-token-id": "<add github token>",
+                        "branch": ""
+                    }
+                },
+                "type": "workspaces"
+            }
+        }
     },
-    {
-        "key": "Name",
-        "value": "tfcloud_ntp1",
-        "description": "This is a API Created Name variable",
-        "category": "terraform"
-    }
-]
+    "vars": [
+        {
+            "key": "org_name",
+            "value": "default",
+            "description": "This is a API Created org variable",
+            "category": "terraform"
+        },
+        {
+            "key": "Name",
+            "value": "tfcloud_ntp1",
+            "description": "This is a API Created Name variable",
+            "category": "terraform"
+        }
+    ]
+}
