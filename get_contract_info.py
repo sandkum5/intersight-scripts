@@ -9,6 +9,9 @@ import csv
 
 
 def getCount(AUTH):
+    """
+    Get Object Count
+    """
     url = "https://intersight.com/api/v1/asset/DeviceContractInformations?$count=True"
     response = requests.request("GET", url, auth=AUTH)
     countData = response.json()
