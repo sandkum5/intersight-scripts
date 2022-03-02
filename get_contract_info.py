@@ -104,3 +104,7 @@ def main():
             row = list(data_dict.values())
             # Write Device info as a csv row
             csvwriter.writerow(row)
+
+            
+if __name__ == "__main__":
+    main()
