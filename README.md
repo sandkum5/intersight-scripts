@@ -16,8 +16,9 @@ Contract,Contract.ContractNumber,Contract.LineStatus,ContractStatus,ContractStat
 Get's Device related details including NIC/Storage drivers and other details. 
 
 `Note`: 
-Use $top and $skip to return the output in batches if the server count exceeds 500 as the amount of data returned would be huge. 
-Update the .env with the api_key_id to use this script. 
+- Use $top and $skip to return the output in batches if the server count exceeds 500 as the amount of data returned would be huge. 
+- Update the .env with the api_key_id to use this script. 
+- Refer `get_contract_info.py` for pagination example using $top, $skip.
 
 **Output**: This script should generate a hcl_status_info.csv file.
 
