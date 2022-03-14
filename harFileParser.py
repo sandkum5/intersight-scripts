@@ -28,3 +28,10 @@ with open(filename, "r") as f:
         # print(f"HTTP METHOD       : {http_method}")
         # print(f"X-Startship-Token : {x_startship_token}")
         # print(f"URL               : {http_url}")
+        
+        # Write Output to a text file
+        # with open("harFiltered.log", 'a') as f:
+        #    f.write("\n")
+        #    f.write("HTTP METHOD       : " + http_method + "\n")
+        #    f.write("X-Startship-Token : " + x_startship_token + "\n")
+        #    f.write("URL               : " + http_url + "\n")
