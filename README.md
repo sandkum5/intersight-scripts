@@ -34,6 +34,30 @@ Create/list below objects in Terraform Cloud using Terraform Cloud API through I
 
 `.env`: Add Intersight api_key_id in this file
 
+---
+**Script Name**: `harFileParser.py` :
+Parse HAR Files generated for Intersight
+Prints:
+ - HTTP Method
+ - X-Startship-Token
+ - URL
+
+```
+Sample Output:
+
+% ./har_parser.py                                   
+Please enter the HAR Filename: intersight-export-servers.com.har
+
+HTTP METHOD       : GET
+X-Startship-Token : e479c24925fb4711555e7e6a7976ee797xxxxxxxxxxxxxe
+URL               : https://intersight.com/api/v1/network/ElementSummaries?$filter=((tolower(AlarmSummary.Warning)%20gt%200)%20and%20(tolower(AlarmSummary.Critical)%20eq%200))&$count=true
+
+HTTP METHOD       : GET
+X-Startship-Token : e479c24925fb4711555e7e6a7976exxxxxxxxxxxxsssss
+URL               : https://intersight.com/api/v1/network/ElementSummaries?$filter=((tolower(AlarmSummary.Critical)%20gt%200))&$count=true
+
+```
+
 --- 
 ### How to use the provided scripts: 
 1. Clone this repo: git clone https://github.com/sandkum5/intersight-scripts.git
