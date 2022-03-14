@@ -21,6 +21,10 @@ with open(filename, "r") as f:
                 x_startship_token = cookie["value"]
         # http_response_data = entry["response"]["content"]["text"]
         print("")
-        print(f"HTTP METHOD       : {http_method}")
-        print(f"X-Startship-Token : {x_startship_token}")
-        print(f"URL               : {http_url}")
+        print("HTTP METHOD       : " + http_method)
+        print("X-Startship-Token : " + x_startship_token)
+        print("URL               : " + http_url)
+        # Using F-string for Python 3.6+
+        # print(f"HTTP METHOD       : {http_method}")
+        # print(f"X-Startship-Token : {x_startship_token}")
+        # print(f"URL               : {http_url}")
