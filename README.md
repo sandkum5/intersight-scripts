@@ -45,7 +45,7 @@ Prints:
 ```
 Sample Output:
 
-% ./har_parser.py                                   
+% ./harFileParser.py                                   
 Please enter the HAR Filename: intersight-export-servers.com.har
 
 HTTP METHOD       : GET
