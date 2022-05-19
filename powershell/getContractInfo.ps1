@@ -12,7 +12,6 @@ $count = 0
 $totalCount = (Get-IntersightAssetDeviceContractInformation -Count $true).Count
 while ($count -le $totalCount)
 {
-    # $csv += Get-IntersightAssetDeviceContractInformation -Top 100 -Skip $skip | select -ExpandProperty Results | select  ContractStatus,ContractStatusReason,ServiceDescription,ServiceLevel,ServiceStartDate,ServiceEndDate,SalesOrderNumber,PurchaseOrderNumber,PlatformType,DeviceType,DeviceId -ExpandProperty Contract  | select DeviceId,DeviceType,PlatformType,ContractNumber,LineStatus,ContractStatus,ContractStatusReason,ServiceDescription,ServiceLevel,ServiceStartDate,ServiceEndDate,SalesOrderNumber,PurchaseOrderNumber
     Get-IntersightAssetDeviceContractInformation -Top 100 -Skip $skip | select -ExpandProperty Results | select  ContractStatus,ContractStatusReason,ServiceDescription,ServiceLevel,ServiceStartDate,ServiceEndDate,SalesOrderNumber,PurchaseOrderNumber,PlatformType,DeviceType,DeviceId -ExpandProperty Contract  | select DeviceId,DeviceType,PlatformType,ContractNumber,LineStatus,ContractStatus,ContractStatusReason,ServiceDescription,ServiceLevel,ServiceStartDate,ServiceEndDate,SalesOrderNumber,PurchaseOrderNumber | Export-Csv -Path "ContractInfo.csv" -NoTypeInformation -Append
     $skip += 100
     $count += 100
