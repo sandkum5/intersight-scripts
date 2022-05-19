@@ -10,7 +10,6 @@ Set-IntersightConfiguration @ApiParams
 $skip = 0
 $count = 0
 $totalCount = (Get-IntersightAssetDeviceContractInformation -Count $true).Count
-# $csv = @()
 while ($count -le $totalCount)
 {
     # $csv += Get-IntersightAssetDeviceContractInformation -Top 100 -Skip $skip | select -ExpandProperty Results | select  ContractStatus,ContractStatusReason,ServiceDescription,ServiceLevel,ServiceStartDate,ServiceEndDate,SalesOrderNumber,PurchaseOrderNumber,PlatformType,DeviceType,DeviceId -ExpandProperty Contract  | select DeviceId,DeviceType,PlatformType,ContractNumber,LineStatus,ContractStatus,ContractStatusReason,ServiceDescription,ServiceLevel,ServiceStartDate,ServiceEndDate,SalesOrderNumber,PurchaseOrderNumber
@@ -18,10 +17,3 @@ while ($count -le $totalCount)
     $skip += 100
     $count += 100
 }
-
-# STALE CODE
-# Export to a CSV File
-# $csv | Export-Csv -Path "ContractInfo.csv" -NoTypeInformation
-
-# Print the results
-# $csv | group DeviceType, ContractStatus | select Name, Count
