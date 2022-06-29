@@ -44,7 +44,7 @@ ChassisId     : 1
 SlotId        : 2
 HardwareUuid  : 4xxxxxxx-9xxx-4xxx-8xxx-42DAxxxxx1
 MgmtIpAddress : 198.xx.xx.xx
-Name          : imm-fi-loan-1-2
+Name          : imm-fi-1-2
 PlatformType  : IMCBlade
 Model         : UCSB-B200-M5
 Serial        : FCHxxxxxxx1
@@ -53,7 +53,7 @@ ChassisId     : 1
 SlotId        : 4
 HardwareUuid  : xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx2
 MgmtIpAddress : 198.xx.xx.xx
-Name          : imm-fi-loan-1-4
+Name          : imm-fi-1-4
 PlatformType  : IMCBlade
 Model         : UCSB-B200-M5
 Serial        : FCHxxxxxxx2
@@ -62,7 +62,7 @@ ChassisId     : 1
 SlotId        : 3
 HardwareUuid  : xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx3
 MgmtIpAddress : 198.xx.xx.xx
-Name          : imm-fi-loan-1-3
+Name          : imm-fi-1-3
 PlatformType  : IMCBlade
 Model         : UCSB-B200-M5
 Serial        : FCHxxxxxxx3
@@ -71,7 +71,7 @@ ChassisId     : 1
 SlotId        : 1
 HardwareUuid  : xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx4
 MgmtIpAddress : 198.xx.xx.xx
-Name          : imm-fi-loan-1-1
+Name          : imm-fi-1-1
 PlatformType  : IMCBlade
 Model         : UCSB-B200-M5
 Serial        : FCHxxxxxxx4
