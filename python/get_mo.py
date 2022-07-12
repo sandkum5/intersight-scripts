@@ -51,7 +51,7 @@ def main():
     # Create an AUTH Object
     AUTH = IntersightAuth(
         secret_key_filename="./SecretKey.txt",
-        api_key_id=os.getenv("api-key-id")
+        api_key_id=os.getenv("api_key_id")
     )
 
     # Send Request
