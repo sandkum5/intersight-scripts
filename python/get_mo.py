@@ -44,12 +44,14 @@ def main():
 
     # Sample Paths: ntp/Policies, kubernets/AddonPolicies
     url = f"{base_url}{args.path}"
-    print(url)
+    print("")
+    print(f"API URL: {url}")
+    print("")
 
     # Create an AUTH Object
     AUTH = IntersightAuth(
-        secret_key_filename="./labv3secretkey.txt",
-        api_key_id=os.getenv("labv3")
+        secret_key_filename="./SecretKey.txt",
+        api_key_id=os.getenv("api-key-id")
     )
 
     # Send Request
