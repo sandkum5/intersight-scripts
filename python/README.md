@@ -35,6 +35,26 @@ Create/list below objects in Terraform Cloud using Terraform Cloud API through I
 `.env`: Add Intersight api_key_id in this file
 
 ---
+**Script Name**: `get_mo.py` :
+Get Intersight Objects 
+  
+- Update the .env with the api_key_id to use this script. 
+- Add SecretKey.txt file with the Intersight Secret Key.
+
+```
+Sample Run: 
+
+# ./get_mo_data.py --path "ntp/Policies?\$filter=Name eq 'IMM-FI-LOAN_NTP'&\$select=Name"
+
+[{'ClassId': 'ntp.Policy',
+  'Moid': 'xxxxxxxxxxxxxxxxxx',
+  'Name': 'IMM-FI-LOAN_NTP',
+  'ObjectType': 'ntp.Policy'}]
+  
+
+```
+
+---
 **Script Name**: `harFileParser.py` :
 Parse HAR Files generated for Intersight
 Prints:
