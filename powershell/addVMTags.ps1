@@ -10,6 +10,10 @@ Caveats:
 -Doesn't take into consideration if 2 VM's have same name under different vCenters
 #>
 
+####################################################################
+########################## VMware Section ##########################
+####################################################################
+
 # Install-Module -Name VMware.PowerCLI
 # Import-Module -Name VMware.PowerCLI
 
@@ -96,6 +100,22 @@ tags.json sample output:
   }
 ]
 #>
+
+####################################################################
+##################### Cisco Intersight Section #####################
+####################################################################
+
+# Install-Module -Name Intersight.PowerShell
+# Import-Module -Name Intersight.PowerShell
+
+$ApiParams = @{
+    BasePath = "https://intersight.com"
+    ApiKeyId = Get-Content -Path ./apiKey.txt -Raw
+    ApiKeyFilePath = $pwd.Path + "/SecretKey.txt"
+    HttpSigningHeader = @("(request-target)", "Host", "Date", "Digest")
+}
+
+Set-IntersightConfiguration @ApiParams
 
 # Update Intersight VM Tags using Tags exported from vCenter
 $tagData = Get-Content -Path './tags.json' | ConvertFrom-Json
