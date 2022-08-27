@@ -1,6 +1,7 @@
 <#
 Usecase:
--At present, Intersight doesn't pull vCenter Tags for the VMs under Virtuazliation tab in Intersight.
+-At present, Intersight doesn't pull vCenter Tags for the VMs under Virtuazliation tab in Intersight. 
+-This scripts pulls vCenter VM tags and add the tags to VM's showing under Intersight > Virtualizations tab.
 
 Steps:
 - Connect to vCenter
