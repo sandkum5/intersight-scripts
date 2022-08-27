@@ -1,13 +1,18 @@
 <#
+Usecase:
+-At present, Intersight doesn't pull vCenter Tags for the VMs under Virtuazliation tab in Intersight.
+
 Steps:
 - Connect to vCenter
 - Get VM Name, Tags
 - Write to tags.json
 - Connect to Intersight and update VM tags
 
-Caveats:
--This script doesn't include error handling
--Doesn't take into consideration if 2 VM's have same name under different vCenters
+Improvments:
+-Add error handling
+-Add code to handle duplicate VM names under different vCenters
+-Add code to keep existing Intersight VM tags. At present, this script will overwrite existing Intersight VM tags.
+-Add code to run this againts multiple vCenters
 #>
 
 ####################################################################
