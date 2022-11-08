@@ -2,15 +2,6 @@
     Clone Link Aggregation Policy
 #>
 
-$ApiParams = @{
-    BasePath          = "https://intersight.com"
-    ApiKeyId          = Get-Content -Path "./sankey.txt" -Raw
-    ApiKeyFilePath    = $pwd.Path + "/sanSecretKey.txt"
-    HttpSigningHeader = @("(request-target)", "Host", "Date", "Digest")
-}
-
-Set-IntersightConfiguration @ApiParams
-
 Function Invoke-CloneLinkAggregationPolicy {
     Param (
         # Variables
