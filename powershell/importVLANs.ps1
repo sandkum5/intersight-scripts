@@ -2,7 +2,7 @@
 # Takes a CSV file exported from UCSM
 $ApiParams = @{
     BasePath          = "https://intersight.com"
-    ApiKeyId          = Get-Content -Path "./ApiKey.txt" -Raw
+    ApiKeyId          = Get-Content -Path "./apiKey.txt" -Raw
     ApiKeyFilePath    = $pwd.Path + "/SecretKey.txt"
     HttpSigningHeader = @("(request-target)", "Host", "Date", "Digest")
 }
