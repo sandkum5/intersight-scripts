@@ -1,7 +1,8 @@
 <#
     Clone Chassis Profile
     Note:
-        Chassis Profile clone only works when the current and target Organization are same.
+        At present, This script only works when the current and target Organization are same.
+        Still a Work-in-progress
 #>
 
 Function Invoke-CloneChassisProfile {
