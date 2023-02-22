@@ -14,7 +14,7 @@ $vlanList = Import-Csv ./vlans.csv -Header @("Name", "ID")
 
 
 # Uncomment below two lines if the VLAN/Multicast Policies already exist
-# $vlanPolicy = Get-IntersightFabricEthNetworkPolicy -Name "Cigna-VLAN-Policy" | Get-IntersightMoMoRef
+# $vlanPolicy = Get-IntersightFabricEthNetworkPolicy -Name "Demo-VLAN-Policy" | Get-IntersightMoMoRef
 # $mcastPolicy = Get-IntersightFabricMulticastPolicy -Name "MCAST" | Get-IntersightMoMoRef
 
 
