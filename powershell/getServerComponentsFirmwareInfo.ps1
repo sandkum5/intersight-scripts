@@ -11,8 +11,9 @@ $ApiParams = @{
 
 Set-IntersightConfiguration @ApiParams
 
-
 $moids = Get-IntersightComputePhysicalSummary | Select-Object Moid
+
+$firstobject = $true
 
 foreach ($moid in $moids.Moid) {
     # Get Server Info
@@ -28,8 +29,18 @@ foreach ($moid in $moids.Moid) {
 
     $firmwareMoids = (Get-IntersightSearchSearchItem -Filter "Ancestors/any(t:t/Moid eq `'$moid`') and ObjectType eq 'firmware.RunningFirmware'").Results.Moid
     $array = @()
+
+    $i = $true
     foreach ($firmwareMoid in $firmwareMoids) {
-        $componentInfo = $firmwareInfo.PsObject.Copy()
+        if($i)
+        {
+            $componentInfo = $firmwareInfo.PsObject.Copy()
+            $i = $false
+        }
+        else
+        {
+            $componentInfo = New-Object PSObject
+        }
         $componentFirmware = Get-IntersightFirmwareRunningFirmware -Moid $firmwareMoid | Select-Object Dn,_Version,Type,Component
         $componentInfo | Add-Member -NotePropertyName "Component DN" -NotePropertyValue $componentFirmware.Dn
         $componentInfo | Add-Member -NotePropertyName "Component Version" -NotePropertyValue $componentFirmware._Version
@@ -37,5 +48,13 @@ foreach ($moid in $moids.Moid) {
         $componentInfo | Add-Member -NotePropertyName "Component" -NotePropertyValue $componentFirmware.Component
         $array += $componentInfo
     }
-    $array | ConvertTo-Csv | Out-File "./FirmwareInfo.csv" -Append
+    if($firstobject)
+    {
+        $array | ConvertTo-Csv | Out-File "./FirmwareInfo.csv" -Append
+        $firstobject = $false
+    }
+    else
+    {
+        $array | ConvertTo-Csv | Select-object -Skip 1 | Out-File "./FirmwareInfo.csv" -Append
+    }
 }
