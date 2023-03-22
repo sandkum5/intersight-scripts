@@ -80,5 +80,5 @@ ForEach ($InterSightFISumm in $InterSightFISummary) {
     }
 }
 
-$InterSightEtherPhysicalPorts | Export-CSV (Excel csv file path) -NoType
-$InterSightFCPhysicalPorts | Export-CSV (Excel csv file path) -NoType
+$InterSightEtherPhysicalPorts | Export-CSV "./ethPortCount.csv" -NoType
+$InterSightFCPhysicalPorts | Export-CSV "./fcPortCount.csv" -NoType
