@@ -1,5 +1,19 @@
 <#
-    Script to pull Port utilization on the FI's and export to Excel
+    Script to get Port Count of all the FI's in Intersight
+    Useful for situations when we want to find the number of ports in use on the FI's to count the needed licenses.
+    
+    Note: 
+      Under Intersight > Infrastructure Service > Operate > Fabric Interconnects, the "Ports Used" column doesn't list the actual number of ports used. 
+      This column includes the FC ports which are in disabled state.
+      FC ports should not be included in license consumption if disabled. 
+    
+    Understanding When Ports Will Consume Licenses
+      All configured Ethernet ports will consume licenses.
+        This is regardless of whether the port is connected and has an active link or not.
+        To release unneccessarily consumed licenses, unused Ethernet ports should be unconfigured.
+      All FC ports that are not shutdown will consume licenses.
+        To release unneccessarily consumed licenses, unused FC ports should be shut down.
+     Ref: https://www.cisco.com/c/en/us/support/docs/servers-unified-computing/ucs-infrastructure-ucs-manager-software/200638-Understanding-and-Troubleshooting-UCS-Li.html#anc9
 #>
 
 $ApiParams = @{
