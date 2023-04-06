@@ -25,7 +25,7 @@ def getData(AUTH, count):
     loop_count = (count // 100) + 1
     for x in range(loop_count):
         skip_value = x * 100
-        url = f"https://intersight.com/api/v1/asset/DeviceContractInformations?$skip={skip_value}&$top=100&$select=Contract,Contract.ContractNumber,Contract.LineStatus,ContractStatus,ContractStatusReason,ServiceDescription,ServiceLevel,ServiceStartDate,ServiceEndDate,SalesOrderNumber,PurchaseOrderNumber,PlatformType,DeviceType,DeviceId"
+        url = f"https://intersight.com/api/v1/asset/DeviceContractInformations?$skip={skip_value}&$top=100&$select=Contract,Contract,Contract,ContractStatus,ContractStatusReason,ServiceDescription,ServiceLevel,ServiceStartDate,ServiceEndDate,SalesOrderNumber,PurchaseOrderNumber,PlatformType,DeviceType,DeviceId"
         response = requests.request("GET", url, auth=AUTH)
         contractData = response.json()
         return contractData
