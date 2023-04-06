@@ -1,6 +1,11 @@
 #!/usr/bin/python3
 """
 Script to parse Intersight HAR files
+
+Input:
+    Har Filename
+    URL Path E.g. fabric/UplinkPcRoles, ntp/Policies
+
 Returns:
     Request:
         Method
@@ -12,6 +17,8 @@ Returns:
         Status
         StatusText
         Response Data
+        
+Creates an output file: harFiltered.log
 """
 import json
 
@@ -56,7 +63,7 @@ with open(filename, "r") as f:
             print(150 * '*')
             print("")
 
-        # Write Output to a text file
+            # Write Output to a text file
             with open("harFiltered.log", 'a') as f:
                 f.write(" ** REQUEST INFO **\n")
                 f.write(f"HTTP METHOD         : {http_method}\n")
