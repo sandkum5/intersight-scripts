@@ -16,7 +16,7 @@ if ($ServerSerial -ne "") {
     $ServerRel = (Get-IntersightComputePhysicalSummary -Filter "Serial eq $($ServerSerial)").Results | Get-IntersightMoMoRef
 }
 if ($ServerName -ne "") {
-    $ServerRel = (Get-IntersightComputePhysicalSummary -Filter "Serial eq $($ServerName)").Results | Get-IntersightMoMoRef
+    $ServerRel = (Get-IntersightComputePhysicalSummary -Name $ServerName | Get-IntersightMoMoRef
 }
 
 # Get ServerProfile associated with Server
@@ -32,7 +32,7 @@ if ($ServerProfile) {
     $VnicEthIfs = (Get-IntersightVnicEthIf -Filter "(Profile.Moid eq '$($ServerProfile.Moid)')").Results
 }
 else {
-    Write-Host "Server is not Associated with any Server Profile!"
+    Write-Host "Server is not associated with any Server Profile!"
 }
 
 # Boot Policy
