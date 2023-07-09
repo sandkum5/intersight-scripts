@@ -1,4 +1,4 @@
-# Script to create User Groups
+# Sample Script to create User Groups
 # Two Step process
 # Step-1: Create Group
 # Step-2: Create Qualifier
