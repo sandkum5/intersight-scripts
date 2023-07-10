@@ -1,0 +1,42 @@
+intersight:
+  iam:
+    rgs:
+    orgs:
+      - Name: "org1"
+        Description: "PWSH Org1"
+        RGs:
+          - "prod-rg"
+          - "demo-rg1"
+      - Name: "org2"
+        Description: "PWSH Org2"
+        RGs:
+          - "demo-rg1"
+    roles:
+      - Name: "pwsh_demo1"
+        Description: "Role Created using PowerShell"
+        EnableSessionLimits: $True
+        SessionLimits:
+          IdleTimeOut: 1800
+          MaximumLimit: 128
+          SessionTimeOut: 57600
+        AccessControl:
+          - OrgName: 'prod'
+            Permisssions:
+              - "Device Administrator"
+              - "Server Administrator"
+          - OrgName: 'tfdemo'
+            Permissions:
+              - "Storage Administrator"
+              - "SAN Administrator"
+    groups:
+      - Name: "pwsh_demo1"
+        IdpName: "Cisco"
+        Roles:
+          - "tfdemo"
+          - "Server Administrator"
+    users:
+      - UserEmail: "test@lab.com"
+        IdpName: "Cisco"
+        Roles:
+          - "tfdemo"
+          - "Server Administrator"
