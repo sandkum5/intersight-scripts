@@ -1,40 +1,59 @@
-# Sample Script to Create Intersight Roles
+# Function to Create Intersight Roles
 # NOTE: With API, Role is created using IamPermission and Permissions are created using IamResourceRoles
+Function CreateRole {
+    [CmdletBinding()]
+    [OutputType()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $true)]
+        [string]$Description,
+        [Parameter(Mandatory = $false)]
+        [hashtable]$SessionLimits,
+        [Parameter(Mandatory = $false)]
+        [array]$AccessControl
+    )
 
-# Create Role
-$RoleName = "pwsh_demo1"
-$NewRole = New-IntersightIamPermission -Name $RoleName -Description "Role Created using Powershell"
-# -SessionLimits <IamSessionLimitsRelationship> -Tags <System.Collections.Generic.List`1[MoTag]> -Roles <System.Collections.Generic.List`1[IamRoleRelationship]>
+    # Verify if a Role already exists
+    $VerifyRole = Get-IntersightIamPermission -Name $Name
 
-# Create Session Limits
-New-IntersightIamSessionLimits -IdleTimeOut 1800 -MaximumLimit 128 -SessionTimeOut 57600 -Permission ($NewRole | Get-IntersightMoMoRef) | Out-Null
-# Default Session Timeout Values
-# IdleTimeOut    : 1800
-# MaximumLimit   : 128
-# SessionTimeOut : 57600
-# PerUserLimit   : 32
+    # Create Role
+    if ($null -eq $VerifyRole) {
+        $NewRole = New-IntersightIamPermission -Name $Name -Description $Description
+    } else {
+        Write-Host "Role $($Name) already exists!" -ForegroundColor Red
+    }
 
-# Get Org1 Relationship
-$Org1 = "prod"
-$Org1Rel = Get-IntersightOrganizationOrganization -Name $Org1 | Get-IntersightMoMoRef
+    # Create Session Limits and associated to Role
+    if ($NewRole) {
+        Write-Host "Created Role: $($Name) Successfully!" -ForegroundColor Green
+        # Default Session Timeout Values
+        # IdleTimeOut    : 1800
+        # MaximumLimit   : 128
+        # SessionTimeOut : 57600
+        # PerUserLimit   : 32
+        $NewSessionLimit = New-IntersightIamSessionLimits -IdleTimeOut 1800 -MaximumLimit 128 -SessionTimeOut 57600 -Permission ($NewRole | Get-IntersightMoMoRef)
+        if ($NewSessionLimit) {
+            Write-Host "Session Limits Applied Successfully!" -ForegroundColor Green
+        }
+    }
 
-# Get Org2 Relationship
-$Org2 = "tfdemo"
-$Org2Rel = Get-IntersightOrganizationOrganization -Name $Org2 | Get-IntersightMoMoRef
+    foreach ($Access in $AccessControl) {
+        # Get Org Relationship
+        $OrgRel = Get-IntersightOrganizationOrganization -Name $Access.OrgName | Get-IntersightMoMoRef
 
-# Assign Org to Permissions
-# $Orgs = Get-IntersightOrganizationOrganization -Select Name
-# $Orgs.results | Where-Object {$_.Name -eq $Org1} | Get-IntersightMoMoRef
-# Or
+        $PermissionsList = [System.Collections.ArrayList]@()
+        foreach ($Permission in $Access.Permissions) {
+            $PermissionRel = Get-IntersightIamRole -Name $Permission | Get-IntersightMoMoRef
+            $PermissionsList.Add($PermissionRel) | Out-Null
+        }
 
-New-IntersightIamResourceRoles -Permission ($NewRole | Get-IntersightMoMoRef) -Resource $Org2Rel -Roles $PermissionsList
-
-$PermissionsList = [System.Collections.ArrayList]@()
-
-$r1 = Get-IntersightIamRole -Name 'Server Administrator' | Get-IntersightMoMoRef
-$r2 = Get-IntersightIamRole -Name 'Device Administrator' | Get-IntersightMoMoRef
-$PermissionsList.Add($r1) | Out-Null
-$PermissionsList.Add($r2) | Out-Null
-
-New-IntersightIamResourceRoles -Permission ($NewRole | Get-IntersightMoMoRef) -Resource $Org1Rel -Roles $PermissionsList
-New-IntersightIamResourceRoles -Permission ($NewRole | Get-IntersightMoMoRef) -Resource $Org2Rel -Roles $PermissionsList
+        # Assign Org to Permissions
+        if ($OrgRel -and $PermissionsList -and $NewRole) {
+            $ApplyPermissions = New-IntersightIamResourceRoles -Permission ($NewRole | Get-IntersightMoMoRef) -Resource $OrgRel -Roles $PermissionsList
+            if ($ApplyPermissions) {
+                Write-Host "Org Permissions Applied Successfully to the Role!" -ForegroundColor Green
+            }
+        }
+    }
+}
