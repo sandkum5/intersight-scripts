@@ -1,19 +1,41 @@
-# Sample Script to create Users
+# Function to create Users
 
-$UserEmail = "test@lab.com"
+Function CreateUser {
+    [CmdletBinding()]
+    [OutputType()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$UserEmail,
+        [Parameter(Mandatory = $true)]
+        [string]$IdpName,
+        [Parameter(Mandatory = $true)]
+        [array]$Roles
+    )
 
-# Idp Reference
-$IdpName = "Cisco"
-$IdpRel = Get-IntersightIamIdpReference -Name $IdpName | Get-IntersightMoMoRef
+    # Idp Reference
+    $IdpRel = Get-IntersightIamIdpReference -Name $IdpName | Get-IntersightMoMoRef
 
-# Permissions(Roles) Reference
-$RoleList = [System.Collections.ArrayList]@()
-$role1 = "tfdemo"
-$role2 = "Server Administrator"
-$role1Rel = Get-IntersightIamPermission -Name $role1 | Get-IntersightMoMoRef
-$role2Rel = Get-IntersightIamPermission -Name $role2 | Get-IntersightMoMoRef
-$RoleList.Add($role1Rel) | Out-Null
-$RoleList.Add($role2Rel) | Out-Null
+    # Permissions(Roles) Reference
+    $RoleList = [System.Collections.ArrayList]@()
+    foreach ($Role in $Roles) {
+        $RoleRel = Get-IntersightIamPermission -Name $Role | Get-IntersightMoMoRef
+        if ($null -eq $RoleRel) {
+            $RoleList.Add($RoleRel) | Out-Null
+        }
+    }
 
-# Create User
-New-IntersightIamUser -Email $UserEmail -Idpreference $IdpRel -Permissions $RoleList
+    # Verify if a User already exists
+    $VerifyUser = Get-IntersightIamUser -Email $UserEmail
+
+    if (($null -eq $VerifyUser) -and ($null -eq $IdpRel)) {
+        # Create User
+        $NewUser = New-IntersightIamUser -Email $UserEmail -Idpreference $IdpRel -Permissions $RoleList
+
+        # Write Output Message
+        Write-Host "$($NewUser.Email) Created Successfully!" -ForegroundColor Green
+    } elseif ($VerifyUser.Name -eq $Name) {
+        Write-Host "User $($UserEmail) already Exists!" -ForegroundColor Red
+    } elseif ($null -eq $IdpRel) {
+        Write-Host "Can't find Idp provider: $($IdpName)!"
+    }
+}
