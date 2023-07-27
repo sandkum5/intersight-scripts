@@ -1,4 +1,13 @@
 # Script to Trigger Intersight OS Installation Workflow
+$ApiParams = @{
+    BasePath          = "https://intersight.com"
+    ApiKeyId          = Get-Content -Path "./apiKey.txt" -Raw
+    ApiKeyFilePath    = $pwd.Path + "/SecretKey.txt"
+    HttpSigningHeader = @("(request-target)", "Host", "Date", "Digest")
+}
+
+Set-IntersightConfiguration @ApiParams
+
 $OrgName = "default"
 $ServerSerial = 'xxxxxxxx'
 
