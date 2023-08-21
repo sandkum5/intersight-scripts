@@ -13,30 +13,62 @@ This is where you would type the input related help information.
 
 #>
 
+Function Invoke-GetAlarmCount {
+    [CmdletBinding()]
+    [OutputType()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$AlarmType,
+        [Parameter(Mandatory = $false)]
+        [string]$Time,
+        [Parameter(Mandatory = $true)]
+        [string]$AffectedMoName
+    )
+
+    if ( $AlarmType -eq "cleared" ) {
+        $filter="(Severity eq 'Cleared' and OrigSeverity ne 'Cleared' and Acknowledge eq 'None'"
+    } elseif ( $AlarmType -eq "acked" ) {
+        $filter="(Severity in ('Critical', 'Warning', 'Info') and Acknowledge eq 'Acknowledge'"
+    } elseif ( $AlarmType -eq "active" ) {
+        $filter="(Severity in ('Critical', 'Warning', 'Info') and Acknowledge eq 'None' and contains(tolower(AffectedMoDisplayName),'$($AffectedMoName)')"
+    }
+
+    try {
+        $AllAlarms = Get-IntersightCondAlarm -InlineCount 'allpages' -Filter "$($filter) and CreationTime lt now() sub '$($Time)')"
+        $AlarmCount = $AllAlarms.Count
+        return $AlarmCount
+    }
+    catch {
+        Write-Host "Get Alarm Count operation Failed!"
+    }
+}
+
 Function Invoke-GetAlarms {
     [CmdletBinding()]
     [OutputType()]
     param (
-        [Parameter(Mandatory = $false)]
-        [string]$type = "active",
+        [Parameter(Mandatory = $true)]
+        [string]$AlarmType,
         [Parameter(Mandatory = $false)]
         [int]$top = 100,
         [Parameter(Mandatory = $false)]
         [int]$skip = 0,
         [Parameter(Mandatory = $false)]
-        [string]$Time = "P0Y0M0D"
+        [string]$Time,
+        [Parameter(Mandatory = $true)]
+        [string]$AffectedMoName
     )
 
-    if ( $type -eq "cleared" ) {
+    if ( $AlarmType -eq "cleared" ) {
         $filter="(Severity eq 'Cleared' and OrigSeverity ne 'Cleared' and Acknowledge eq 'None'"
-    } elseif ( $type -eq "acked" ) {
+    } elseif ( $AlarmType -eq "acked" ) {
         $filter="(Severity in ('Critical', 'Warning', 'Info') and Acknowledge eq 'Acknowledge'"
-    } elseif ( $type -eq "active" ) {
-        $filter="(Severity in ('Critical', 'Warning', 'Info') and Acknowledge eq 'None'"
+    } elseif ( $AlarmType -eq "active" ) {
+        $filter="(Severity in ('Critical', 'Warning', 'Info') and Acknowledge eq 'None' and contains(tolower(AffectedMoDisplayName),'$($AffectedMoName)')"
     }
 
     try {
-        $Alarms = Get-IntersightCondAlarm -Top $top -Skip $skip -Filter "$($filter) and CreationTime lt now() sub '$($Time)')" -Expand 'RegisteredDevice($select=PlatformType,DeviceHostname,ParentConnection)' -Orderby "LastTransitionTime desc" | Select-Object -ExpandProperty Results | Select-Object CreationTime,Moid,Code,Description,MsAffectedObject,OrigSeverity
+        $Alarms = Get-IntersightCondAlarm -Top $top -Skip $skip -Filter "$($filter) and CreationTime lt now() sub '$($Time)')" -Expand 'RegisteredDevice($select=PlatformType,DeviceHostname,ParentConnection)' -Orderby "LastTransitionTime desc" | Select-Object -ExpandProperty Results | Select-Object CreationTime,Moid,AffectedMoDisplayName,Code,Description,MsAffectedObject,OrigSeverity #,RegisteredDevice
         return $Alarms
     }
     catch {
@@ -71,15 +103,25 @@ $ApiParams = @{
 
 Set-IntersightConfiguration @ApiParams
 
-$AlarmCount = (Get-IntersightCondAlarm -Count $true).Count
+$AlarmType = "acked" # Options: active, cleared, acked
+$AlarmAckState = "None" # Options: Acknowledge, None
+$AlarmTime = "P0Y0M0D"
+$AffectedMoName = "imm-fi-loan"
 
-$top = 1000
+$AlarmCount = Invoke-GetAlarmCount -AffectedMoName $AffectedMoName -Time $AlarmTime -AlarmType $AlarmType
+
+$top = 2
 $skip = 0
+$Alarms = @()
 for ($i=0; $i -lt $AlarmCount/$top; $i++) {
-    $Alarms = Invoke-GetAlarms -Time 'P1Y7M1D' -top $top -skip $skip
-    foreach ($Alarm in $Alarms) {
-        Write-Host $Alarm
-        Invoke-UpdateAlarm -Moid $Alarm.Moid -AckState "Acknowledge" | Out-Null
-    }
+    $Alarms += Invoke-GetAlarms -Time $AlarmTime -top $top -skip $skip -AffectedMoName $AffectedMoName -AlarmType $AlarmType
     $skip += $top
+}
+
+if ($Alarms) {
+    foreach ($Alarm in $Alarms) {
+        $Moid = $Alarm.Moid
+        Write-Host "Working on Alarm Moid: " $Moid
+        Invoke-UpdateAlarm -Moid $Moid -AckState $AlarmAckState | Out-Null
+    }
 }
