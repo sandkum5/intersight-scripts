@@ -2,7 +2,7 @@
 # Time Format: 'P0Y11M1D': 0 years, 11 Months, 1 Day
 
 <#
-This is where you would type the input-related help information.
+This is where you would type the input related help information.
 .SYNOPSIS
 
 .DESCRIPTION
@@ -91,7 +91,6 @@ Function Invoke-UpdateAlarm {
         Write-Host "Error Encountered while Setting Alarm Acknowledge State!"
     }
 }
-
 
 $ApiParams = @{
     BasePath = "https://intersight.com"
