@@ -2,7 +2,7 @@
 # Time Format: 'P0Y11M1D': 0 years, 11 Months, 1 Day
 
 <#
-This is where you would type the input related help information.
+This is where you would type the input-related help information.
 .SYNOPSIS
 
 .DESCRIPTION
@@ -34,8 +34,8 @@ Function Invoke-GetAlarmCount {
     }
 
     try {
-        $AllAlarms = Get-IntersightCondAlarm -InlineCount 'allpages' -Filter "$($filter) and CreationTime lt now() sub '$($Time)')"
-        $AlarmCount = $AllAlarms.Count
+        $Alarms = Get-IntersightCondAlarm -InlineCount 'allpages' -Filter "$($filter) and CreationTime lt now() sub '$($Time)')"
+        $AlarmCount = $Alarms.Count
         return $AlarmCount
     }
     catch {
