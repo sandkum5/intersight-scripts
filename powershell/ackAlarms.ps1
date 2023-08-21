@@ -35,8 +35,7 @@ Function Invoke-GetAlarmCount {
 
     try {
         $Alarms = Get-IntersightCondAlarm -InlineCount 'allpages' -Filter "$($filter) and CreationTime lt now() sub '$($Time)')"
-        $AlarmCount = $Alarms.Count
-        return $AlarmCount
+        return $Alarms.Count
     }
     catch {
         Write-Host "Get Alarm Count operation Failed!"
