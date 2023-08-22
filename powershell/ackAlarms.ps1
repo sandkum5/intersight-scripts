@@ -108,7 +108,7 @@ $AffectedMoName = "imm-fi-loan"
 
 $AlarmCount = Invoke-GetAlarmCount -AffectedMoName $AffectedMoName -Time $AlarmTime -AlarmType $AlarmType
 
-$top = 2
+$top = 1000
 $skip = 0
 $Alarms = @()
 for ($i=0; $i -lt $AlarmCount/$top; $i++) {
