@@ -39,6 +39,7 @@ Function Invoke-GetAlarmCount {
     }
     catch {
         Write-Host "Get Alarm Count operation Failed!"
+        Write-Host $_
     }
 }
 
@@ -72,6 +73,7 @@ Function Invoke-GetAlarms {
     }
     catch {
         Write-Host "Get Alarms operation Failed!"
+        Write-Host $_
     }
 }
 
