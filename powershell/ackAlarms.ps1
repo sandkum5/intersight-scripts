@@ -1,5 +1,4 @@
 <#
-This is where you would type the input related help information.
 .SYNOPSIS
     Acknowledge Intersight Alarms
 .DESCRIPTION
@@ -20,7 +19,6 @@ This is where you would type the input related help information.
     Be sure to check out more PowerShell code on https://github.com/CiscoDevNet/intersight-powershell-utils
 
 .EXAMPLE
-
 #>
 
 Function Invoke-GetAlarmCount {
