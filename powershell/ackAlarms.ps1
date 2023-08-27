@@ -186,8 +186,8 @@ Function Invoke-UpdateAlarm {
 # Intersight API Configuration
 $ApiParams = @{
     BasePath = "https://intersight.com"
-    ApiKeyId = Get-Content -Path "/Users/sandkum5/.intersight/dcloud-lab/v2/ApiKey.txt" -Raw
-    ApiKeyFilePath = "/Users/sandkum5/.intersight/dcloud-lab/v2/SecretKey.txt"
+    ApiKeyId = Get-Content -Path "/Path/to/ApiKey.txt" -Raw
+    ApiKeyFilePath = "/Path/to/SecretKey.txt"
     HttpSigningHeader = @("(request-target)", "Host", "Date", "Digest")
 }
 
