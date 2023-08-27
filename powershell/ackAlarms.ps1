@@ -194,10 +194,10 @@ $ApiParams = @{
 Set-IntersightConfiguration @ApiParams
 
 # Input Parameters
-$AlarmType = "active" # Options: active, cleared, acked
-$AlarmAckState = "Acknowledge" # Options: Acknowledge, None
-$AlarmTime = "P0Y0M0D"
-$AffectedMoName = "imm-fi-loan"
+$AlarmType      = "active"      # Options: active, cleared, acked
+$AlarmAckState  = "Acknowledge" # Options: Acknowledge, None
+$AlarmTime      = "P0Y0M0D"
+$AffectedMoName = ""
 
 # Get Alarm Count
 $AlarmCount = Invoke-GetAlarmCount -AffectedMoName $AffectedMoName -Time $AlarmTime -AlarmType $AlarmType
