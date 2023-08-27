@@ -210,29 +210,29 @@ if ($AlarmCount -eq 0) {
     $top = 1000
     $pages = [int][Math]::Ceiling($AlarmCount/$top)
     $Alarms = @()
-    try {
-        for ($i=0; $i -lt $pages; $i++) {
-            Write-Host "Get $($AlarmType) Alarms!"
+    for ($i=0; $i -lt $pages; $i++) {
+        Write-Host "Get $($AlarmType) Alarms!"
+        try {
             $Alarms += Invoke-GetAlarms -Time $AlarmTime -top $top -skip ($i*$top) -AffectedMoName $AffectedMoName -AlarmType $AlarmType
         }
-    }
-    catch {
-        Write-Host "Error encountered during Alarm Get Operation!"
-        Write-Host $_
+        catch {
+            Write-Host "Error encountered during Alarm Get Operation!"
+            Write-Host $_
+        }
     }
 }
 
 # Update Alarms
-try {
-    if ($Alarms) {
-        foreach ($Alarm in $Alarms) {
-            $Moid = $Alarm.Moid
+if ($Alarms) {
+    foreach ($Alarm in $Alarms) {
+        $Moid = $Alarm.Moid
+        try {
             Write-Host "Alarm Moid: $($Moid), Update Alarm Ack State to: $($AlarmAckState)"
             Invoke-UpdateAlarm -Moid $Moid -AckState $AlarmAckState | Out-Null
         }
+        catch {
+            Write-Host "Error encountered during Alarm Update Operation!"
+            Write-Host $_
+        }
     }
-}
-catch {
-    Write-Host "Error encountered during Alarm Update Operation!"
-    Write-Host $_
 }
