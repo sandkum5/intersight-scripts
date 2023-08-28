@@ -2,6 +2,7 @@
 .SYNOPSIS
     Script to Import UCSM VLANs in Intersight
 .DESCRIPTION
+    NOTE: Please be careful with the VLAN Policy name as it will update any existing policy.
     Script to Import UCSM VLANs in Intersight
     Input Parameters
         $OrgName        - Organization under which we want to create the VLAN Policy. Make sure the Org is created within Intersight
