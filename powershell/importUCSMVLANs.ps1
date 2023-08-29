@@ -19,10 +19,11 @@
 
 # Intersight Configuration
 $ApiParams = @{
-    BasePath          = "https://intersight.com"
-    ApiKeyId          = Get-Content -Path "/Path/to/ApiKey.txt" -Raw
-    ApiKeyFilePath    = "/Path/to/SecretKey.txt"
-    HttpSigningHeader = @("(request-target)", "Host", "Date", "Digest")
+    BasePath             = "https://intersight.com"
+    ApiKeyId             = Get-Content -Path "/Path/to/ApiKey.txt" -Raw
+    ApiKeyFilePath       = "/Path/to/SecretKey.txt"
+    HttpSigningHeader    = @("(request-target)", "Host", "Date", "Digest")
+    SkipCertificateCheck = $false
 }
 
 Set-IntersightConfiguration @ApiParams
