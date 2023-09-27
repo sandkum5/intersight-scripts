@@ -69,16 +69,18 @@ foreach ($server in $jsonData.Server) {
 
 # Sample Output
 <#
-> ./serverResourcePoolInfo.ps1
-Server: cx-hx-fi2-ucsm-6
-Server: imm-fi-loan-1-1
+> ./serverResourcePoolInfo.ps1Server: imm-fi-loan-1-1
 Server: cx-imm-ucs-4
 Server: imm-fi-loan-1-3
     ResourcePool: RP_demo1
+    ResourcePool: RP_demo2
 Server: cx-imm-ucs-5
 Server: cx-imm-ucs-3
 Server: imm-fi-loan-1-4
     ResourcePool: RP_demo1
+    ResourcePool: RP_demo2
 Server: imm-fi-loan-1-2
+    ResourcePool: RP_demo2
 Server: cx-hx-fi1-ucsm-6
+Server: cx-hx-fi1-ucsm-7
 #>
