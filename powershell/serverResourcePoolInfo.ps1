@@ -1,4 +1,5 @@
 # Script to List Server Name along with Resource Pool Name
+# Show which servers are not part of any resource pool or part of one or more than one resource pool
 
 $ApiParams = @{
     BasePath = "https://intersight.com"
