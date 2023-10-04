@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+"""
+Script to verify Intersight AutoRMA configuration
+Does the following:
+ - Checks if AutoRMA is configured at Account/Org/Asset/Device Level
+ - Lists Active Faults with AutoRMA fault codes
+ - List contracts associated with claimed devices in Intersight
+ - Allows AutoRMA configuration at Account/Org level
+Update Line 286 with the Intersight FQDN. If SAAS, no changes are needed.
+Add ApiKey.txt and SecretKey.txt files with the API keys in the same directory before script execution.
+"""
 import json
 import requests
 from intersight_auth import IntersightAuth
