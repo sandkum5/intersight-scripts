@@ -128,7 +128,7 @@ foreach($vlan in $vlans) {
                 Write-Host "Creating Default Multicast Policy: $($DefaultMulticastPolicyName)" -ForegroundColor Green
                 $multicastPolicy = New-IntersightFabricMulticastPolicy -Name $DefaultMulticastPolicyName -Organization $orgRel -SnoopingState $SnoopingState -QuerierState $QuerierState
             } else {
-                Write-Host "Creating Multicast Policy: $(MulticastPolicyName)" -ForegroundColor Green
+                Write-Host "Creating Multicast Policy: $($MulticastPolicyName)" -ForegroundColor Green
                 $multicastPolicy = New-IntersightFabricMulticastPolicy -Name $MulticastPolicyName -Organization $orgRel -SnoopingState $SnoopingState -QuerierState $QuerierState
             }
 
