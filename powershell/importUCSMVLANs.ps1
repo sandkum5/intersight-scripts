@@ -59,8 +59,9 @@ if ($ethNetworkPolicyRel) {
 }
 
 # Get VLANs from CSV
-$VlanList = Import-Csv $FileName -Header @("Name", "ID", "Type", "Transport", "Native", "VLANSharing", "PrimaryVLAN", "MulticastPolicyName")
-$vlans = $VlanList | Select-Object -Skip 1
+# $VlanList = Import-Csv $FileName -Header @("Name", "ID", "Type", "Transport", "Native", "VLANSharing", "PrimaryVLAN", "MulticastPolicyName")
+# $vlans = $VlanList | Select-Object -Skip 1
+$vlans = Import-Csv $FileName
 
 
 foreach($vlan in $vlans) {
