@@ -649,6 +649,15 @@ Function Invoke-GetServerInventory {
     Invoke-GetServerInfo -Data $Data -Server $Server
 }
 
+# Intersight API Configuration
+$ApiParams = @{
+    BasePath = "https://intersight.com"
+    ApiKeyId = Get-Content -Path ./apiKey.txt -Raw
+    ApiKeyFilePath = $pwd.Path + "/SecretKey.txt"
+    HttpSigningHeader = @("(request-target)", "Host", "Date", "Digest")
+}
+
+Set-IntersightConfiguration @ApiParams
 
 $value = Read-Host "Enter a value(Options: single or all): " # Prompt the user for input
 
