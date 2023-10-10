@@ -693,14 +693,14 @@ Function Invoke-GetServerInventory {
     Invoke-GetServerInfo -Data $Data -Server $Server
 }
 
-# Start Script Execution
+
+# Script Execution
 # Intersight Configuration
 $ApiParams = @{
-    BasePath             = "https://intersight.com"
-    ApiKeyId             = Get-Content -Path "/Path/to/ApiKey.txt" -Raw
-    ApiKeyFilePath       = "/Path/to/SecretKey.txt"
-    HttpSigningHeader    = @("(request-target)", "Host", "Date", "Digest")
-    SkipCertificateCheck = $false
+    BasePath = "https://intersight.com"
+    ApiKeyId = Get-Content -Path ./apiKey.txt -Raw
+    ApiKeyFilePath = $pwd.Path + "/SecretKey.txt"
+    HttpSigningHeader = @("(request-target)", "Host", "Date", "Digest")
 }
 
 Set-IntersightConfiguration @ApiParams
