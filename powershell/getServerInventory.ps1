@@ -1,16 +1,20 @@
 <#
-    Script to Get a single Server or first 1000 server Inventory along with Firmware Info from Intersight and write to a inventory.json file
+    Script to Get a single Server or first 1000 server Inventory along with Firmware Info from Intersight and write to an inventory.json file
 #>
+
+# Functions
 Function Invoke-GetCPUInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse CPU Info
-    $CPUInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "ProcessorUnit"}).AdditionalProperties
-    $CPUList = [System.Collections.ArrayList]@()
-    foreach ($i in $CPUInfo) {
-        $cpu = @{
+    $ComponentName = "ProcessorUnit"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Architecture"      = $i.Architecture
             "Description"       = $i.Description
             "Dn"                = $i.Dn
@@ -28,21 +32,23 @@ Function Invoke-GetCPUInfo {
             "Stepping"          = $i.Stepping
             "Vendor"            = $i.Vendor
         }
-        $CPUList.Add($cpu) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("CPU", $CPUList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetDIMMInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse DIMM Info
-    $DIMMInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "MemoryUnit"}).AdditionalProperties
-    $DIMMList = [System.Collections.ArrayList]@()
-    foreach ($i in $DIMMInfo) {
-        $dimm = @{
+    $ComponentName = "MemoryUnit"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "ArrayId"     = $i.ArrayId
             "Bank"        = $i.Bank
             "Capacity"    = $i.Capacity
@@ -64,20 +70,22 @@ Function Invoke-GetDIMMInfo {
             "Visibility"  = $i.Visibility
             "Width"       = $i.Width
         }
-        $DIMMList.Add($dimm) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("DIMM", $DIMMList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 Function Invoke-GetAdapterInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse Adapter Info
-    $AdapterInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "AdapterUnit"}).AdditionalProperties
-    $AdapterList = [System.Collections.ArrayList]@()
-    foreach ($i in $AdapterInfo) {
-        $adapter = @{
+    $ComponentName = "AdapterUnit"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "AdapterId" = $i.ArrayId
             "Dn"        = $i.Dn
             "Model"     = $i.Model
@@ -86,20 +94,22 @@ Function Invoke-GetAdapterInfo {
             "Serial"    = $i.Serial
             "Vendor"    = $i.Vendor
         }
-        $AdapterList.Add($adapter) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("Adapter", $AdapterList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 Function Invoke-GetAdapterExtEthInterfaceInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse Adapter External Interface Info
-    $AdapterExtEthInterfaceInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "AdapterExtEthInterface"}).AdditionalProperties
-    $AdapterExtEthInterfaceList = [System.Collections.ArrayList]@()
-    foreach ($i in $AdapterExtEthInterfaceInfo) {
-        $adapterextethinterface = @{
+    $ComponentName = "AdapterExtEthInterface"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Dn"                = $i.Dn
             "ExtEthInterfaceId" = $i.ExtEthInterfaceId
             "InterfaceType"     = $i.InterfaceType
@@ -108,21 +118,23 @@ Function Invoke-GetAdapterExtEthInterfaceInfo {
             "PeerPortId"        = $i.PeerPortId
             "PeerSlotId"        = $i.PeerSlotId
         }
-        $AdapterExtEthInterfaceList.Add($adapterextethinterface) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("AdapterExtEthInterface", $AdapterExtEthInterfaceList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetAdapterHostEthInterfaceInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse Adapter Ethernet Interface Info
-    $AdapterHostEthInterfaceInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "AdapterHostEthInterface"}).AdditionalProperties
-    $AdapterHostEthInterfaceList = [System.Collections.ArrayList]@()
-    foreach ($i in $AdapterHostEthInterfaceInfo) {
-        $adapterhostethinterface = @{
+    $ComponentName = "AdapterHostEthInterface"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Dn"                 = $i.Dn
             "HostEthInterfaceId" = $i.ExtEthInterfaceId
             "InterfaceType"      = $i.InterfaceType
@@ -131,21 +143,23 @@ Function Invoke-GetAdapterHostEthInterfaceInfo {
             "StandByVifId"       = $i.StandByVifId
             "VifId"              = $i.VifId
         }
-        $AdapterHostEthInterfaceList.Add($adapterhostethinterface) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("AdapterHostEthInterface", $AdapterHostEthInterfaceList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetAdapterHostFcInterfaceInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse Adapter Host FC Interface Info
-    $AdapterHostFcInterfaceInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "AdapterHostFcInterface"}).AdditionalProperties
-    $AdapterHostFcInterfaceList = [System.Collections.ArrayList]@()
-    foreach ($i in $AdapterHostFcInterfaceInfo) {
-        $adapterhostfcinterface = @{
+    $ComponentName = "AdapterHostFcInterface"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Dn"                = $i.Dn
             "HostFcInterfaceId" = $i.HostFcInterfaceId
             "Name"              = $i.Name
@@ -153,20 +167,22 @@ Function Invoke-GetAdapterHostFcInterfaceInfo {
             "Wwnn"              = $i.Wwnn
             "Wwpn"              = $i.Wwpn
         }
-        $AdapterHostFcInterfaceList.Add($adapterhostfcinterface) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("AdapterHostFcInterface", $AdapterHostFcInterfaceList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 Function Invoke-GetStorageControllerInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse Storage Controller Info
-    $StorageControllerInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "StorageController"}).AdditionalProperties
-    $StorageControllerList = [System.Collections.ArrayList]@()
-    foreach ($i in $StorageControllerInfo) {
-        $controller = @{
+    $ComponentName = "StorageController"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "ConnectedSasExpander"    = $i.ConnectedSasExpander
             "ControllerId"            = $i.ControllerId
             "Dn"                      = $i.Dn
@@ -185,20 +201,22 @@ Function Invoke-GetStorageControllerInfo {
             "TotalCacheSize"          = $i.TotalCacheSize
             "Vendor"                  = $i.Vendor
         }
-        $StorageControllerList.Add($controller) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("StorageController", $StorageControllerList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 Function Invoke-GetStoragePhysicalDiskInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse Storage Physical Disk Info
-    $StoragePhysicalDiskInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "StoragePhysicalDisk"}).AdditionalProperties
-    $StoragePhysicalDiskList = [System.Collections.ArrayList]@()
-    foreach ($i in $StoragePhysicalDiskInfo) {
-        $StoragePhysicalDisk = @{
+    $ComponentName = "StoragePhysicalDisk"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "ConnectedSasExpander"    = $i.ConnectedSasExpander
             "ControllerId"            = $i.ControllerId
             "Dn"                      = $i.Dn
@@ -217,42 +235,46 @@ Function Invoke-GetStoragePhysicalDiskInfo {
             "TotalCacheSize"          = $i.TotalCacheSize
             "Vendor"                  = $i.Vendor
         }
-        $StoragePhysicalDiskList.Add($StoragePhysicalDisk) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("StoragePhysicalDisk", $StoragePhysicalDiskList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetStorageFlexUtilControllerInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse StorageFlexUtilController Info
-    $StorageFlexUtilControllerInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "StorageFlexUtilController"}).AdditionalProperties
-    $StorageFlexUtilControllerList = [System.Collections.ArrayList]@()
-    foreach ($i in $StorageFlexUtilControllerInfo) {
-        $StorageFlexUtilController = @{
+    $ComponentName = "StorageFlexUtilController"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "ControllerName"   = $i.ControllerName
             "ControllerStatus" = $i.ControllerStatus
             "Dn"               = $i.Dn
             "FfControllerId"   = $i.FfControllerId
             "InternalState"    = $i.InternalState
         }
-        $StorageFlexUtilControllerList.Add($StorageFlexUtilController) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("StorageFlexUtilController", $StorageFlexUtilControllerList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetStorageFlexUtilPhysicalDriveInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse StorageFlexUtilPhysicalDrive Info
-    $StorageFlexUtilPhysicalDriveInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "StorageFlexUtilPhysicalDrive"}).AdditionalProperties
-    $StorageFlexUtilPhysicalDriveList = [System.Collections.ArrayList]@()
-    foreach ($i in $StorageFlexUtilPhysicalDriveInfo) {
-        $StorageFlexUtilPhysicalDrive = @{
+    $ComponentName = "StorageFlexUtilPhysicalDrive"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "BlockSize"        = $i.BlockSize
             "Capacity"         = $i.Capacity
             "Controller"       = $i.Controller
@@ -270,21 +292,23 @@ Function Invoke-GetStorageFlexUtilPhysicalDriveInfo {
             "Serial"           = $i.Serial
             "WriteEnabled"     = $i.WriteEnabled
         }
-        $StorageFlexUtilPhysicalDriveList.Add($StorageFlexUtilPhysicalDrive) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("StorageFlexUtilPhysicalDrive", $StorageFlexUtilPhysicalDriveList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetStorageFlexUtilVirtualDriveInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse StorageFlexUtilVirtualDrive Info
-    $StorageFlexUtilVirtualDriveInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "StorageFlexUtilVirtualDrive"}).AdditionalProperties
-    $StorageFlexUtilVirtualDriveList = [System.Collections.ArrayList]@()
-    foreach ($i in $StorageFlexUtilVirtualDriveInfo) {
-        $StorageFlexUtilVirtualDrive = @{
+    $ComponentName = "StorageFlexUtilVirtualDrive"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Dn"            = $i.Dn
             "DriveStatus"   = $i.DriveStatus
             "DriveType"     = $i.DriveType
@@ -294,83 +318,91 @@ Function Invoke-GetStorageFlexUtilVirtualDriveInfo {
             "Size"          = $i.Size
             "VirtualDrive"  = $i.VirtualDrive
         }
-        $StorageFlexUtilVirtualDriveList.Add($StorageFlexUtilVirtualDrive) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("StorageFlexUtilVirtualDrive", $StorageFlexUtilVirtualDriveList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetBootHddDeviceInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse BootHddDevice Info
-    $BootHddDeviceInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "BootHddDevice"}).AdditionalProperties
-    $BootHddDeviceList = [System.Collections.ArrayList]@()
-    foreach ($i in $BootHddDeviceInfo) {
-        $BootHddDevice = @{
+    $ComponentName = "BootHddDevice"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Dn"    = $i.Dn
             "Name"  = $i.Name
             "Order" = $i.Order
             "State" = $i.State
             "Type"  = $i.Type
         }
-        $BootHddDeviceList.Add($BootHddDevice) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("BootHddDevice", $BootHddDeviceList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $BootHddDeviceList) | Out-Null
 }
 
 Function Invoke-GetBootPchStorageDeviceInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse BootPchStorageDevice Info
-    $BootPchStorageDeviceInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "BootPchStorageDevice"}).AdditionalProperties
-    $BootPchStorageDeviceList = [System.Collections.ArrayList]@()
-    foreach ($i in $BootPchStorageDeviceInfo) {
-        $BootPchStorageDevice = @{
+    $ComponentName = "BootPchStorageDevice"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Dn"    = $i.Dn
             "Name"  = $i.Name
             "Order" = $i.Order
             "State" = $i.State
             "Type"  = $i.Type
         }
-        $BootPchStorageDeviceList.Add($BootPchStorageDevice) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("BootPchStorageDevice", $BootPchStorageDeviceList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 Function Invoke-GetBootVmediaDeviceInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse BootVmediaDevice Info
-    $BootVmediaDeviceInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "BootVmediaDevice"}).AdditionalProperties
-    $BootVmediaDeviceList = [System.Collections.ArrayList]@()
-    foreach ($i in $BootVmediaDeviceInfo) {
-        $BootVmediaDevice = @{
+    $ComponentName = "BootVmediaDevice"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Dn"    = $i.Dn
             "Name"  = $i.Name
             "Order" = $i.Order
             "State" = $i.State
             "Type"  = $i.Type
         }
-        $BootVmediaDeviceList.Add($BootVmediaDevice) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("BootVmediaDevice", $BootVmediaDeviceList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetFANInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse FAN Info
-    $FANInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "EquipmentFan"}).AdditionalProperties
-    $FANList = [System.Collections.ArrayList]@()
-    foreach ($i in $FANInfo) {
-        $fan = @{
+    $ComponentName = "EquipmentFan"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Dn"        = $i.Dn
             "FanId" = $i.ArrayId
             "FanModuleId" = $i.Model
@@ -379,21 +411,23 @@ Function Invoke-GetFANInfo {
             "Presence"    = $i.Presence
             "TrayId"      = $i.TrayId
         }
-        $FANList.Add($fan) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("Fan", $FANList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetPSUInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse PSU Info
-    $PSUInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "EquipmentPsu"}).AdditionalProperties
-    $PSUList = [System.Collections.ArrayList]@()
-    foreach ($i in $PSUInfo) {
-        $psu = @{
+    $ComponentName = "EquipmentPsu"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Dn"       = $i.Dn
             "Model"    = $i.Model
             "Presence" = $i.Presence
@@ -402,21 +436,23 @@ Function Invoke-GetPSUInfo {
             "Vendor"   = $i.Vendor
             "Voltage"  = $i.Voltage
         }
-        $PSUList.Add($psu) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("PSU", $PSUList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetEquipmentTpmInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse EquipmentTpm Info
-    $EquipmentTpmInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "EquipmentTpm"}).AdditionalProperties
-    $EquipmentTpmList = [System.Collections.ArrayList]@()
-    foreach ($i in $EquipmentTpmInfo) {
-        $EquipmentTpm = @{
+    $ComponentName = "EquipmentTpm"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "ActivationStatus"    = $i.ActivationStatus
             "AdminState"          = $i.AdminState
             "Dn"                  = $i.Dn
@@ -431,21 +467,23 @@ Function Invoke-GetEquipmentTpmInfo {
             "Vendor"              = $i.Vendor
             "Version"             = $i.Version
         }
-        $EquipmentTpmList.Add($EquipmentTpm) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("EquipmentTpm", $EquipmentTpmList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetManagementInterfaceInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse PSU Info
-    $ManagementInterfaceInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "ManagementInterface"}).AdditionalProperties
-    $ManagementInterfaceList = [System.Collections.ArrayList]@()
-    foreach ($i in $ManagementInterfaceInfo) {
-        $ManagementInterface = @{
+    $ComponentName = "ManagementInterface"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Dn"          = $i.Dn
             "Gateway"     = $i.Gateway
             "HostName"    = $i.HostName
@@ -460,41 +498,45 @@ Function Invoke-GetManagementInterfaceInfo {
             "Mask"        = $i.Mask
             "VlanId"      = $i.VlanId
         }
-        $ManagementInterfaceList.Add($ManagementInterface) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("ManagementInterface", $ManagementInterfaceList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetLocatorLedInfo {
     Param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
     # Parse LocatorLed Info
-    $LocatorLedInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "EquipmentLocatorLed"}).AdditionalProperties
-    $LocatorLedList = [System.Collections.ArrayList]@()
-    foreach ($i in $LocatorLedInfo) {
-        $locatorled = @{
+    $ComponentName = "EquipmentLocatorLed"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Color"     = $i.Color
             "Dn"        = $i.Dn
             "OperState" = $i.OperState
         }
-        $LocatorLedList.Add($locatorled) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("LocatorLed", $LocatorLedList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetPciInfo {
     param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
 
     # Parse PCI Info
-    $PciInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "PciDevice"}).AdditionalProperties
-    $PciList = [System.Collections.ArrayList]@()
-    foreach ($i in $PciInfo) {
-        $pci = @{
+    $ComponentName = "PciDevice"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Dn"              = $i.Dn
             "FirmwareVersion" = $i.FirmwareVersion
             "Model"           = $i.Model
@@ -502,30 +544,32 @@ Function Invoke-GetPciInfo {
             "SlotId"          = $i.SlotId
             "Vendor"          = $i.Vendor
         }
-        $PciList.Add($pci) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial).Specs).Add("PciDevice", $PciList) | Out-Null
+    ($Data.($Server.Serial).Specs).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetFirmwareInfo {
     param (
         $ServerInventory,
-        $Data
+        $Data,
+        $Server
     )
 
     # Parse Firmware Info
-    $FirmwareInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq "FirmwareRunningFirmware"}).AdditionalProperties
-    $FirmwareList = [System.Collections.ArrayList]@()
-    foreach ($i in $FirmwareInfo) {
-        $firmware = @{
+    $ComponentName = "FirmwareRunningFirmware"
+    $ComponentInfo = ($ServerInventory | Where-Object {$_.ObjectType -eq $ComponentName}).AdditionalProperties
+    $ComponentList = [System.Collections.ArrayList]@()
+    foreach ($i in $ComponentInfo) {
+        $properties = @{
             "Component" = $i.Component
             "Type"      = $i.Type
             "Version"   = $i.Version
             "Dn"        = $i.Dn
         }
-        $FirmwareList.Add($firmware) | Out-Null
+        $ComponentList.Add($properties) | Out-Null
     }
-    ($Data.($Server.Serial)).Add("ComponentFirmware", $FirmwareList) | Out-Null
+    ($Data.($Server.Serial)).Add($ComponentName, $ComponentList) | Out-Null
 }
 
 Function Invoke-GetServerInfo {
@@ -534,7 +578,7 @@ Function Invoke-GetServerInfo {
         $Data
     )
     # Parse Server Info
-    $ServerInfo = @{
+    $properties = @{
         "Name"                = $Server.Name
         "Model"               = $Server.Model
         "PlatformType"        = $Server.PlatformType
@@ -564,7 +608,7 @@ Function Invoke-GetServerInfo {
         "SlotId"              = $Server.SlotId
         "ServiceProfile"      = $Server.ServiceProfile
     }
-    ($Data.($Server.Serial)).Add("Info", $ServerInfo) | Out-Null
+    ($Data.($Server.Serial)).Add("Info", $properties) | Out-Null
 }
 
 Function Invoke-GetServerInventory {
@@ -583,78 +627,80 @@ Function Invoke-GetServerInventory {
     $ServerInventory = (Get-IntersightSearchSearchItem -Top 1000 -Filter "Ancestors/any(t:t/Moid eq '$Moid')").Results
 
     # Parse Firmware Info
-    Invoke-GetFirmwareInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetFirmwareInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse CPU Info
-    Invoke-GetCPUInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetCPUInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse DIMM Info
-    Invoke-GetDIMMInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetDIMMInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse Adapter Info
-    Invoke-GetAdapterInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetAdapterInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse Adapter External Interface Info
-    Invoke-GetAdapterExtEthInterfaceInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetAdapterExtEthInterfaceInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse Adapter Host Ethernet Interface Info
-    Invoke-GetAdapterHostEthInterfaceInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetAdapterHostEthInterfaceInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse Adapter Host FC Interface Info
-    Invoke-GetAdapterHostFcInterfaceInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetAdapterHostFcInterfaceInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse Storage Controller Info
-    Invoke-GetStorageControllerInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetStorageControllerInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse Storage Physical Disk Info
-    Invoke-GetStoragePhysicalDiskInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetStoragePhysicalDiskInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse StorageFlexUtilController Info
-    Invoke-GetStorageFlexUtilControllerInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetStorageFlexUtilControllerInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse StorageFlexUtilPhysicalDrive Info
-    Invoke-GetStorageFlexUtilPhysicalDriveInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetStorageFlexUtilPhysicalDriveInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse StorageFlexUtilVirtualDrive Info
-    Invoke-GetStorageFlexUtilVirtualDriveInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetStorageFlexUtilVirtualDriveInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse BootHddDevice Info
-    Invoke-GetBootHddDeviceInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetBootHddDeviceInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse BootPchStorageDevice Info
-    Invoke-GetBootPchStorageDeviceInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetBootPchStorageDeviceInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse BootVmediaDevice Info
-    Invoke-GetBootVmediaDeviceInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetBootVmediaDeviceInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse FAN Info
-    Invoke-GetFANInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetFANInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse PSU Info
-    Invoke-GetPSUInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetPSUInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse TPM Info
-    Invoke-GetEquipmentTpmInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetEquipmentTpmInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse Management Interface Info
-    Invoke-GetManagementInterfaceInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetManagementInterfaceInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse Locator LED Info
-    Invoke-GetLocatorLedInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetLocatorLedInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse PCI Info
-    Invoke-GetPciInfo -Data $Data -ServerInventory $ServerInventory
+    Invoke-GetPciInfo -Data $Data -ServerInventory $ServerInventory -Server $Server
 
     # Parse Server Info
     Invoke-GetServerInfo -Data $Data -Server $Server
 }
 
-# Intersight API Configuration
+# Start Script Execution
+# Intersight Configuration
 $ApiParams = @{
-    BasePath = "https://intersight.com"
-    ApiKeyId = Get-Content -Path ./apiKey.txt -Raw
-    ApiKeyFilePath = $pwd.Path + "/SecretKey.txt"
-    HttpSigningHeader = @("(request-target)", "Host", "Date", "Digest")
+    BasePath             = "https://intersight.com"
+    ApiKeyId             = Get-Content -Path "/Path/to/ApiKey.txt" -Raw
+    ApiKeyFilePath       = "/Path/to/SecretKey.txt"
+    HttpSigningHeader    = @("(request-target)", "Host", "Date", "Digest")
+    SkipCertificateCheck = $false
 }
 
 Set-IntersightConfiguration @ApiParams
@@ -678,4 +724,5 @@ switch ($value) {
 }
 
 # Write to JSON file
-$Data | ConvertTo-Json -Depth 8 | Out-File "./inventory.json" -Append
+$InventoryFile = "./inventory.json"
+$Data | ConvertTo-Json -Depth 8 | Out-File $InventoryFile -Append
