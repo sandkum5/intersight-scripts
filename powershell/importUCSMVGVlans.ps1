@@ -20,9 +20,9 @@ Set-IntersightConfiguration @ApiParams
 
 # Variables
 $OrgName               = "default"              # Update
-$EthNetGroupPolicyName = "ISAZ"                 # Update
+$EthNetGroupPolicyName = "demo"                 # Update
 $NativeVLAN            = 1                      # Update
-$FileName              = "ISAZ VLAN Group.csv"  # Update
+$FileName              = "DemoFile.csv"         # Update
 $VLANGroup             = Import-Csv $FileName
 $VLANList              = $VLANGroup."VLAN ID"
 
