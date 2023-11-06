@@ -78,7 +78,7 @@ $MulticastPolicyName = "Demo"               # Update
 $SnoopingState       = "Enabled"            # Update
 $QuerierState        = "Disabled"           # Update
 # CSV file exported from UCSM
-$FileName            = "./ADC_Vlan.csv"      # Update
+$FileName            = "./Demo.csv"         # Update
 $AutoAllowOnUplinks  = $false
 
 
@@ -91,7 +91,7 @@ try {
     if ($multicastPolicyRel) {
         Write-Host "Multicast Policy $($MulticastPolicyName) already exists under Org: $($OrgName)" -ForegroundColor "Green"
     } else {
-        <# Action when all if and elseif conditions are false #>
+        <# Action when all if and else if conditions are false #>
         Write-Host "Creating Multicast Policy: $($MulticastPolicyName)" -ForegroundColor "Green"
         $multicastPolicy = New-IntersightFabricMulticastPolicy -Name $MulticastPolicyName -Organization $orgRel -SnoopingState $SnoopingState -QuerierState $QuerierState
         if ($multicastPolicy) {
