@@ -1,5 +1,7 @@
 ---
-# Code to Create VLAN Policy and Add VLANs
+#
+# Create Intersight VLAN Policy and Add VLANs
+#
 - hosts: localhost
   connection: local
   collections:
