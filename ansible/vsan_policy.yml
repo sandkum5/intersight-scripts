@@ -1,0 +1,85 @@
+---
+#
+# Create Intersight VSAN Policy
+#
+- hosts: localhost
+  connection: local
+  collections:
+    - cisco.intersight
+  gather_facts: false
+  vars:
+    api_info: &api_info
+      api_private_key: "{{ api_private_key | default(omit) }}"
+      api_key_id: "{{ api_key_id | default(omit) }}"
+      api_uri: "{{ api_uri | default(omit) }}"
+      validate_certs: "{{ validate_certs | default(omit) }}"
+    org_name: "default"
+  tasks:
+    # Get Org Info
+    - name: "Get Organization Info"
+      intersight_rest_api:
+        <<: *api_info
+        resource_path: /organization/Organizations
+        query_params:
+          $filter: "Name eq 'default'"
+        return_list: true
+      register: org_info
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: org_info.api_response[0].Moid
+
+    # Create VLAN Policy
+    - name: "Create VSAN Policy"
+      intersight_rest_api:
+        <<: *api_info
+        resource_path: /fabric/FcNetworkPolicies
+        update_method: "post"
+        api_body: {
+          "Organization": {
+              "ObjectType": "organization.Organization",
+              "Moid": "{{ org_info.api_response[0].Moid }}"
+          },
+          "Name": "ansible_demo",
+          "EnableTrunking": false,
+          "Tags": []
+        }
+      register: vsan_policy
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: vsan_policy.api_response.Moid
+
+    # Add VSANs
+    - name: "Add VSANs"
+      intersight_rest_api:
+        <<: *api_info
+        resource_path: "/bulk/Requests"
+        api_body: {
+          "Verb": "POST",
+          "Uri": "/v1/fabric/Vsans",
+          "Requests": [
+              {
+                  "ObjectType": "bulk.RestSubRequest",
+                  "Body": {
+                    "Name": "vsan100",
+                    "VsanId": 100,
+                    "FcoeVlan": 100,
+                    "VsanScope": "Uplink",
+                    "FcNetworkPolicy": "{{ vsan_policy.api_response.Moid }}"
+                  }
+              },
+              {
+                  "ObjectType": "bulk.RestSubRequest",
+                  "Body": {
+                    "Name": "vsan200",
+                    "VsanId": 200,
+                    "FcoeVlan": 200,
+                    "VsanScope": "Storage",
+                    "FcNetworkPolicy": "{{ vsan_policy.api_response.Moid }}"
+                  }
+              }
+            ]
+          }
+      register: add_vsans
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: add_vsans.api_response
