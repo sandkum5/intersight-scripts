@@ -1,0 +1,134 @@
+- hosts: localhost
+  connection: local
+  collections:
+    - cisco.intersight
+  gather_facts: false
+  vars:
+    api_info: &api_info
+      api_private_key: "{{ api_private_key | default(omit) }}"
+      api_key_id: "{{ api_key_id | default(omit) }}"
+      api_uri: "{{ api_uri | default(omit) }}"
+      validate_certs: "{{ validate_certs | default(omit) }}"
+    org_name: "default"
+    multicast_policy: "ansible_demo"
+  tasks:
+    # Get Org Info
+    - name: "Get Organization Info"
+      intersight_rest_api:
+        <<: *api_info
+        resource_path: /organization/Organizations
+        query_params:
+          $filter: "Name eq 'default'"
+        return_list: true
+      register: org_info
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: org_info.api_response[0].Moid
+
+    # Create VLAN Policy
+    - name: "Create VLAN Policy"
+      intersight_rest_api:
+        <<: *api_info
+        resource_path: /fabric/EthNetworkPolicies
+        update_method: "post"
+        api_body: {
+          "Organization": {
+              "ObjectType": "organization.Organization",
+              "Moid": "{{ org_info.api_response[0].Moid }}"
+          },
+          "Name": "ansible_demo",
+          "Description": "Policy Created using Ansible"
+          "Tags": []
+        }
+      register: vlan_policy
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: vlan_policy.api_response.Moid
+
+    # Get Multicast Policy
+    - name: Create Multicast Policy
+      cisco.intersight.intersight_rest_api:
+        <<: *api_info
+        resource_path: "/fabric/MulticastPolicies"
+        query_params:
+          $filter: "Name eq '{{multicast_policy}}'"
+      register: multicast_policy
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: multicast_policy.api_response.Moid
+
+    # Update VLAN1 Multicast Policy
+    - name: "Get VLAN1 Info"
+      intersight_rest_api:
+        <<: *api_info
+        resource_path: /fabric/Vlans
+        query_params:
+          $filter: "(EthNetworkPolicy.Moid eq '{{vlan_policy.api_response.Moid}}' and VlanId eq 1)"
+          $select: "Moid,IsNative,MulticastPolicy"
+          $top: 1000
+        # return_list: true
+      register: vlan1_info
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: vlan1_info.api_response.Moid
+
+    - name: "Update VLAN1 Multicast Policy"
+      intersight_rest_api:
+        <<: *api_info
+        resource_path: "/fabric/Vlans/{{vlan1_info.api_response.Moid}}"
+        api_body: {
+          "Name": "default",
+          "VlanId": 1,
+          "MulticastPolicy": "{{multicast_policy.api_response.Moid}}",
+          "SharingType": "None",
+          "IsNative": false,
+          "AutoAllowOnUplinks": true,
+          "EthNetworkPolicy": "{{vlan_policy.api_response.Moid}}"
+        }
+      register: vlan1_update
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: vlan1_update.api_response
+
+    # Add VLANs
+    - name: "Update VLAN1 Multicast Policy"
+      intersight_rest_api:
+        <<: *api_info
+        resource_path: "/bulk/Requests"
+        api_body: {
+          "Verb": "POST",
+          "Uri": "/v1/fabric/Vlans",
+          "Requests": [
+              {
+                  "ObjectType": "bulk.RestSubRequest",
+                  "Body": {
+                      "Name": "vlan_2",
+                      "VlanId": 2,
+                      "SharingType": "None",
+                      "PrimaryVlanId": 0,
+                      "MulticastPolicy": "{{multicast_policy.api_response.Moid}}",
+                      "AutoAllowOnUplinks": false,
+                      "IsNative": false,
+                      "EthNetworkPolicy": "{{vlan_policy.api_response.Moid}}"
+                  }
+              },
+              {
+                  "ObjectType": "bulk.RestSubRequest",
+                  "Body": {
+                      "Name": "vlan_10",
+                      "VlanId": 10,
+                      "SharingType": "None",
+                      "PrimaryVlanId": 0,
+                      "MulticastPolicy": "{{multicast_policy.api_response.Moid}}",
+                      "AutoAllowOnUplinks": false,
+                      "IsNative": false,
+                      "EthNetworkPolicy": "{{vlan_policy.api_response.Moid}}"
+                  }
+              }
+          ]
+        }
+      register: bulk_vlan_info
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: bulk_vlan_info.api_response
+
