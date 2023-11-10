@@ -1,6 +1,6 @@
 ---
 #
-# Create Intersight VLAN Policy and Add VLANs
+# Create a VLAN Policy, Multicast Policy, Add VLANs from a CSV file exported from UCSM
 #
 - hosts: localhost
   connection: local
@@ -14,7 +14,6 @@
       api_uri: "{{ api_uri | default(omit) }}"
       validate_certs: "{{ validate_certs | default(omit) }}"
     org_name: "default"
-    multicast_policy: "ansible_demo"
   tasks:
     # Get Org Info
     - name: "Get Organization Info"
@@ -41,7 +40,7 @@
               "Moid": "{{ org_info.api_response[0].Moid }}"
           },
           "Name": "ansible_demo",
-          "Description": "Policy Created using Ansible"
+          "Description": "Policy Created using Ansible",
           "Tags": []
         }
       register: vlan_policy
@@ -49,13 +48,22 @@
       ansible.builtin.debug:
         var: vlan_policy.api_response.Moid
 
-    # Get Multicast Policy
+    # Create Multicast Policy
     - name: Create Multicast Policy
       cisco.intersight.intersight_rest_api:
         <<: *api_info
         resource_path: "/fabric/MulticastPolicies"
-        query_params:
-          $filter: "Name eq '{{multicast_policy}}'"
+        api_body: {
+          "Organization": {
+              "ObjectType": "organization.Organization",
+              "Moid": "{{ org_info.api_response[0].Moid }}"
+          },
+          "Name": "ansible_multicast",
+          "QuerierState": "Disabled",
+          "SnoopingState": "Enabled",
+          "SrcIpProxy": "Enabled",
+          "Tags": []
+        }
       register: multicast_policy
     - name: Print return information from the previous task
       ansible.builtin.debug:
@@ -70,69 +78,73 @@
           $filter: "(EthNetworkPolicy.Moid eq '{{vlan_policy.api_response.Moid}}' and VlanId eq 1)"
           $select: "Moid,IsNative,MulticastPolicy"
           $top: 1000
-        # return_list: true
       register: vlan1_info
     - name: Print return information from the previous task
       ansible.builtin.debug:
         var: vlan1_info.api_response.Moid
 
-    - name: "Update VLAN1 Multicast Policy"
-      intersight_rest_api:
-        <<: *api_info
-        resource_path: "/fabric/Vlans/{{vlan1_info.api_response.Moid}}"
-        api_body: {
-          "Name": "default",
-          "VlanId": 1,
-          "MulticastPolicy": "{{multicast_policy.api_response.Moid}}",
-          "SharingType": "None",
-          "IsNative": false,
-          "AutoAllowOnUplinks": true,
-          "EthNetworkPolicy": "{{vlan_policy.api_response.Moid}}"
-        }
-      register: vlan1_update
-    - name: Print return information from the previous task
-      ansible.builtin.debug:
-        var: vlan1_update.api_response
+    # - name: "Update VLAN1 Multicast Policy"
+    #   intersight_rest_api:
+    #     <<: *api_info
+    #     resource_path: "/fabric/Vlans/{{vlan1_info.api_response.Moid }}"
+    #     api_body: {
+    #       "Name": "default",
+    #       "VlanId": 1,
+    #       "MulticastPolicy": "{{ multicast_policy.api_response.Moid }}",
+    #       "SharingType": "None",
+    #       "IsNative": false,
+    #       "AutoAllowOnUplinks": true,
+    #       "EthNetworkPolicy": "{{ vlan_policy.api_response.Moid }}"
+    #     }
+    #   register: vlan1_update
+    # - name: Print return information from the previous task
+    #   ansible.builtin.debug:
+    #     var: vlan1_update.api_response
 
+    # Parse CSV
+    - name: Load CSV Data into object
+      read_csv:
+        path: 'demo.csv'
+        fieldnames: Name,ID,Type,Transport,Native,VLANSharing,PrimaryVLANName,MulticastPolicyName
+        delimiter: ','
+      register: csv_output
+      delegate_to: localhost
+
+    - name: Parse jinja2 file
+      vars:
+        AutoAllowOnUplinks: "false"
+        IsNative: "false"
+        multicast_policy_moid: "{{ multicast_policy.api_response.Moid }}"
+        vlan_policy_moid: "{{ vlan_policy.api_response.Moid }}"
+        PrimaryVlanId: 0
+        vlans: "{{ csv_output.list[1:] }}"
+      ansible.builtin.template:
+        src: ./yaml.j2
+        dest: ./data.yml
+
+    - name: Read YAML File
+      shell: cat data.yml
+      register: result
+
+    - name: Convert YAML to JSON
+      set_fact:
+        jsondata: "{{ result.stdout | from_yaml | to_json }}"
+
+    - name: Print data
+      debug:
+        msg: "{{ jsondata }}"
     # Add VLANs
-    - name: "Update VLAN1 Multicast Policy"
+    - name: "Add VLANs using Loop"
       intersight_rest_api:
         <<: *api_info
         resource_path: "/bulk/Requests"
         api_body: {
           "Verb": "POST",
           "Uri": "/v1/fabric/Vlans",
-          "Requests": [
-              {
-                  "ObjectType": "bulk.RestSubRequest",
-                  "Body": {
-                      "Name": "vlan_2",
-                      "VlanId": 2,
-                      "SharingType": "None",
-                      "PrimaryVlanId": 0,
-                      "MulticastPolicy": "{{multicast_policy.api_response.Moid}}",
-                      "AutoAllowOnUplinks": false,
-                      "IsNative": false,
-                      "EthNetworkPolicy": "{{vlan_policy.api_response.Moid}}"
-                  }
-              },
-              {
-                  "ObjectType": "bulk.RestSubRequest",
-                  "Body": {
-                      "Name": "vlan_10",
-                      "VlanId": 10,
-                      "SharingType": "None",
-                      "PrimaryVlanId": 0,
-                      "MulticastPolicy": "{{multicast_policy.api_response.Moid}}",
-                      "AutoAllowOnUplinks": false,
-                      "IsNative": false,
-                      "EthNetworkPolicy": "{{vlan_policy.api_response.Moid}}"
-                  }
-              }
-          ]
+          "Requests": "{{ jsondata }}"
         }
       register: bulk_vlan_info
+
     - name: Print return information from the previous task
       ansible.builtin.debug:
         var: bulk_vlan_info.api_response
-
