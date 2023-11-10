@@ -69,19 +69,19 @@
       ansible.builtin.debug:
         var: multicast_policy.api_response.Moid
 
-    # Update VLAN1 Multicast Policy
-    - name: "Get VLAN1 Info"
-      intersight_rest_api:
-        <<: *api_info
-        resource_path: /fabric/Vlans
-        query_params:
-          $filter: "(EthNetworkPolicy.Moid eq '{{vlan_policy.api_response.Moid}}' and VlanId eq 1)"
-          $select: "Moid,IsNative,MulticastPolicy"
-          $top: 1000
-      register: vlan1_info
-    - name: Print return information from the previous task
-      ansible.builtin.debug:
-        var: vlan1_info.api_response.Moid
+    # # Update VLAN1 Multicast Policy
+    # - name: "Get VLAN1 Info"
+    #   intersight_rest_api:
+    #     <<: *api_info
+    #     resource_path: /fabric/Vlans
+    #     query_params:
+    #       $filter: "(EthNetworkPolicy.Moid eq '{{vlan_policy.api_response.Moid}}' and VlanId eq 1)"
+    #       $select: "Moid,IsNative,MulticastPolicy"
+    #       $top: 1000
+    #   register: vlan1_info
+    # - name: Print return information from the previous task
+    #   ansible.builtin.debug:
+    #     var: vlan1_info.api_response.Moid
 
     # - name: "Update VLAN1 Multicast Policy"
     #   intersight_rest_api:
@@ -102,7 +102,7 @@
     #     var: vlan1_update.api_response
 
     # Parse CSV
-    - name: Load CSV Data into object
+    - name: Load CSV Data
       read_csv:
         path: 'demo.csv'
         fieldnames: Name,ID,Type,Transport,Native,VLANSharing,PrimaryVLANName,MulticastPolicyName
@@ -119,11 +119,11 @@
         PrimaryVlanId: 0
         vlans: "{{ csv_output.list[1:] }}"
       ansible.builtin.template:
-        src: ./yaml.j2
+        src: ./vlan_data.j2
         dest: ./data.yml
 
     - name: Read YAML File
-      shell: cat data.yml
+      shell: cat vlan_data.yml
       register: result
 
     - name: Convert YAML to JSON
