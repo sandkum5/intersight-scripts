@@ -1,0 +1,15 @@
+---
+{% for vlan in vlans %}
+- ObjectType: "bulk.RestSubRequest"
+  Body:
+    Name: "{{ vlan.Name }}"
+    VlanId: {{ vlan.ID }}
+    SharingType: "{{ vlan.VLANSharing }}"
+    PrimaryVlanId: {{ PrimaryVlanId }}
+    MulticastPolicy: "{{multicast_policy_moid }}"
+    IsNative: {{ IsNative }}
+    EthNetworkPolicy: "{{ vlan_policy_moid }}"
+    {% if "1" != vlan.ID -%}AutoAllowOnUplinks: {{ AutoAllowOnUplinks }}{% endif %}
+    {%- if "1" == vlan.ID %}AutoAllowOnUplinks: true{% endif %}
+
+{% endfor %}
