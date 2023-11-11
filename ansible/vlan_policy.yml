@@ -69,38 +69,6 @@
       ansible.builtin.debug:
         var: multicast_policy.api_response.Moid
 
-    # # Update VLAN1 Multicast Policy
-    # - name: "Get VLAN1 Info"
-    #   intersight_rest_api:
-    #     <<: *api_info
-    #     resource_path: /fabric/Vlans
-    #     query_params:
-    #       $filter: "(EthNetworkPolicy.Moid eq '{{vlan_policy.api_response.Moid}}' and VlanId eq 1)"
-    #       $select: "Moid,IsNative,MulticastPolicy"
-    #       $top: 1000
-    #   register: vlan1_info
-    # - name: Print return information from the previous task
-    #   ansible.builtin.debug:
-    #     var: vlan1_info.api_response.Moid
-
-    # - name: "Update VLAN1 Multicast Policy"
-    #   intersight_rest_api:
-    #     <<: *api_info
-    #     resource_path: "/fabric/Vlans/{{vlan1_info.api_response.Moid }}"
-    #     api_body: {
-    #       "Name": "default",
-    #       "VlanId": 1,
-    #       "MulticastPolicy": "{{ multicast_policy.api_response.Moid }}",
-    #       "SharingType": "None",
-    #       "IsNative": false,
-    #       "AutoAllowOnUplinks": true,
-    #       "EthNetworkPolicy": "{{ vlan_policy.api_response.Moid }}"
-    #     }
-    #   register: vlan1_update
-    # - name: Print return information from the previous task
-    #   ansible.builtin.debug:
-    #     var: vlan1_update.api_response
-
     # Parse CSV
     - name: Load CSV Data
       read_csv:
