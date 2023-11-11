@@ -4,12 +4,20 @@
   Body:
     Name: "{{ vlan.Name }}"
     VlanId: {{ vlan.ID }}
-    SharingType: "{{ vlan.VLANSharing }}"
-    PrimaryVlanId: {{ PrimaryVlanId }}
-    MulticastPolicy: "{{multicast_policy_moid }}"
     IsNative: {{ IsNative }}
     EthNetworkPolicy: "{{ vlan_policy_moid }}"
-    {% if "1" != vlan.ID -%}AutoAllowOnUplinks: {{ AutoAllowOnUplinks }}{% endif %}
+    SharingType: "{{ vlan.VLANSharing }}"
+    {% if vlan.VLANSharing == "None" %}MulticastPolicy: "{{ multicast_policy_moid }}"{% endif -%}
+    {% if vlan.VLANSharing == "Primary" %}MulticastPolicy: ""{% endif -%}
+    {% if vlan.VLANSharing == "Isolated" %}MulticastPolicy: ""{% endif -%}
+    {% if vlan.VLANSharing == "Community" %}MulticastPolicy: ""{% endif %}
+
+    {% if "1" != vlan.ID %}AutoAllowOnUplinks: {{ AutoAllowOnUplinks }}{% endif %}
+
     {%- if "1" == vlan.ID %}AutoAllowOnUplinks: true{% endif %}
+
+    {% if vlan.PrimaryVLANName != "" %}{% for invlan in vlans %}{% if vlan.PrimaryVLANName in invlan.Name %}PrimaryVlanId: {{ invlan.ID }}{% endif %}{% endfor %}{% endif %}
+
+    {%- if vlan.PrimaryVLANName == "" %}PrimaryVlanId: {{ PrimaryVlanId }}{% endif %}
 
 {% endfor %}
