@@ -1,8 +1,82 @@
 <#
     Print Empty Slots in UCSM Domains connected to Intersight
+    Prints all or Domain Specific Output
     Caveats:
         Doesn't take into consideration a full-width blade
 #>
+
+Function Invoke-ParseAllProperties {
+    param (
+        $properties
+    )
+    #Print Domain, Chassis, EmptySlot Info
+    foreach ($domain in $properties.Keys) {
+        Write-Host "Domain: $($domain)"
+        foreach ($chassis in $properties[$domain].Keys) {
+            $serverList = $properties[$domain][$chassis]
+            $emptySlots = [System.Collections.ArrayList]@()
+            foreach ($server in 1..8) {
+                if ( $serverList -contains $server) {
+                    continue
+                } else {
+                    $emptySlots.Add($server) | Out-Null
+                }
+            }
+            if ($emptySlots) {
+                Write-Host "  Chassis: $($chassis)"
+                Write-Host "    EmptySlots: $($emptySlots)"
+            }
+        }
+    }
+}
+
+Function Invoke-ParseDcProperties {
+    param (
+        $properties
+    )
+    $dc = Read-Host "Please enter DC"
+    foreach ($domain in $properties.Keys) {
+        if ($domain.ToLower().Contains($dc.ToLower())) {
+            Write-Host "Domain: $($domain)"
+            foreach ($chassis in $properties[$domain].Keys) {
+                $serverList = $properties[$domain][$chassis]
+                $emptySlots = [System.Collections.ArrayList]@()
+                foreach ($server in 1..8) {
+                    if ( $serverList -contains $server) {
+                        continue
+                    } else {
+                        $emptySlots.Add($server) | Out-Null
+                    }
+                }
+                if ($emptySlots) {
+                    Write-Host "  Chassis: $($chassis)"
+                    Write-Host "    EmptySlots: $($emptySlots)"
+                }
+            }
+        }
+    }
+}
+
+Function Invoke-ParseDCName {
+    param (
+        $properties,
+        $chars
+    )
+    $dcPrefix = [System.Collections.ArrayList]@()
+    foreach( $domain in $properties.Keys) {
+        $pattern = "^([a-zA-Z0-9]{$($chars)})"
+        $x = $domain | Select-String -Pattern $pattern
+        if ($x) {
+            $prefix = ($x.Matches.Groups[1].Value).ToLower() # Comment ToLower for casesensitive output
+            $dcPrefix.Add($prefix) | Out-Null
+        }
+    }
+    $uniqueList = $dcPrefix| Select-Object -Unique
+    Write-Host "Domain Name Prefixes:"
+    foreach ($chars in $uniqueList) {
+        Write-Host $chars
+    }
+}
 
 $ApiParams = @{
     BasePath = "https://intersight.com"
@@ -14,21 +88,23 @@ $ApiParams = @{
 Set-IntersightConfiguration @ApiParams
 
 #Get Blade Server Names
-$ServerNames = Get-IntersightComputePhysicalSummary -Top 1000 | Where-object {$_.SourceObjectType -eq "compute.Blade"} | Select-Object Name
-
 $ServerNames = [System.Collections.ArrayList]@()
 $skip = 0
 $count = 0
 $totalCount = (Get-IntersightComputePhysicalSummary -Count $true).Count
 
+Write-Host "API call to Intersight In-progress, 1 API call/1000 objects"
 while ($count -le $totalCount)
 {
-    $ServerNames += (Get-IntersightComputePhysicalSummary -Top 100 -Skip $skip).Results | Where-object {$_.SourceObjectType -eq "compute.Blade"} | Select-Object Name
-    $skip += 100
-    $count += 100
+    $loop = ($count / 1000) + 1
+    Write-Host "$($loop) API Call!"
+    $ServerNames += (Get-IntersightComputePhysicalSummary -Top 1000 -Skip $skip).Results | Where-object {$_.SourceObjectType -eq "compute.Blade"} | Select-Object Name
+    $skip += 1000
+    $count += 1000
 }
 
-#Create a nested hashtable
+#Create nested hashtable
+Write-Host "Parsing Intersight Data"
 $properties = @{}
 foreach ($Server in $ServerNames) {
     $x = $Server.Name | Select-String -Pattern "^(.+)-(\d+)-(\d)"
@@ -48,22 +124,20 @@ foreach ($Server in $ServerNames) {
 }
 
 
-#Print Domain, Chassis, EmptySlot Info
-foreach ($domain in $properties.Keys) {
-    Write-Host "Domain: $($domain)"
-    foreach ($chassis in $properties[$domain].Keys) {
-        $serverList = $properties[$domain][$chassis]
-        $emptySlots = [System.Collections.ArrayList]@()
-        foreach ($server in 1..8) {
-            if ( $serverList -contains $server) {
-                continue
-            } else {
-                $emptySlots.Add($server) | Out-Null
-            }
-        }
-        if ($emptySlots) {
-            Write-Host "  Chassis: $($chassis)"
-            Write-Host "    EmptySlots: $($emptySlots)"
-        }
+while ($true) {
+    Write-Host ""
+    Write-Host "Do you want All or DataCenter specific info?"
+    $option = Read-Host "Options: all, dc, exit"
+
+    if ($option.ToLower() -contains "all") {
+        #Get All Domain Empty Slots
+        Invoke-ParseAllProperties -properties $properties
+    } elseif ($option.ToLower() -contains "dc") {
+        #Print available Domain Names prefixes
+        Invoke-ParseDCName -properties $properties -chars 6
+        #Get Domain prefix and print all matching Domains
+        Invoke-ParseDcProperties -properties $properties
+    } elseif ($option.ToLower() -contains "exit") {
+        break
     }
 }
