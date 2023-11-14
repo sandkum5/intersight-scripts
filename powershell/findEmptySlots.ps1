@@ -134,7 +134,8 @@ while ($true) {
         Invoke-ParseAllProperties -properties $properties
     } elseif ($option.ToLower() -contains "dc") {
         #Print available Domain Names prefixes
-        Invoke-ParseDCName -properties $properties -chars 6
+        $chars = Read-Host "Characters to match"
+        Invoke-ParseDCName -properties $properties -chars $chars
         #Get Domain prefix and print all matching Domains
         Invoke-ParseDcProperties -properties $properties
     } elseif ($option.ToLower() -contains "exit") {
