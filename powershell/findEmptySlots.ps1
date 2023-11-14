@@ -9,6 +9,7 @@ Function Invoke-ParseAllProperties {
     param (
         $properties
     )
+    $allEmptySlots = [System.Collections.ArrayList]@()
     #Print Domain, Chassis, EmptySlot Info
     foreach ($domain in $properties.Keys) {
         Write-Host "Domain: $($domain)"
@@ -20,20 +21,23 @@ Function Invoke-ParseAllProperties {
                     continue
                 } else {
                     $emptySlots.Add($server) | Out-Null
+                    $allEmptySlots.Add($server) | Out-Null
                 }
             }
             if ($emptySlots) {
                 Write-Host "  Chassis: $($chassis)"
-                Write-Host "    EmptySlots: $($emptySlots)"
+                Write-Host "    EmptySlotIds: $($emptySlots)"
             }
         }
     }
+    Write-Host "Total Empty Slots: $($allEmptySlots.Count)"
 }
 
 Function Invoke-ParseDcProperties {
     param (
         $properties
     )
+    $allEmptySlots = [System.Collections.ArrayList]@()
     $dc = Read-Host "Please enter DC"
     foreach ($domain in $properties.Keys) {
         if ($domain.ToLower().Contains($dc.ToLower())) {
@@ -46,15 +50,17 @@ Function Invoke-ParseDcProperties {
                         continue
                     } else {
                         $emptySlots.Add($server) | Out-Null
+                        $allEmptySlots.Add($server) | Out-Null
                     }
                 }
                 if ($emptySlots) {
                     Write-Host "  Chassis: $($chassis)"
-                    Write-Host "    EmptySlots: $($emptySlots)"
+                    Write-Host "    EmptySlotIds: $($emptySlots)"
                 }
             }
         }
     }
+    Write-Host "Total Empty Slots: $($allEmptySlots.Count)"
 }
 
 Function Invoke-ParseDCName {
@@ -72,7 +78,7 @@ Function Invoke-ParseDCName {
         }
     }
     $uniqueList = $dcPrefix| Select-Object -Unique
-    Write-Host "Domain Name Prefixes:"
+    Write-Host "Available Domain Name Prefixes:"
     foreach ($chars in $uniqueList) {
         Write-Host $chars
     }
