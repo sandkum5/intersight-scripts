@@ -4,7 +4,6 @@
     Slot Options: Equipped or Available
 """
 import json
-# import csv
 import xlsxwriter
 
 with open('data.json', 'r') as f:
@@ -101,15 +100,3 @@ for domain, chassis, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8 in (
     row += 1
 
 workbook.close()
-
-# Create CSV File
-# csvfile = "emptyslots.csv"
-# with open(csvfile, 'w') as csvfile:
-#     # creating a csv writer object
-#     csvwriter = csv.writer(csvfile)
-
-#     # writing the fields
-#     csvwriter.writerow(fields)
-
-#     # writing the data rows
-#     csvwriter.writerows(rows)
