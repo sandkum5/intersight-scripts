@@ -129,6 +129,7 @@ foreach ($Server in $ServerNames) {
     $properties[$DomainName][$ChassisId].Add($ServerId) | Out-Null
 }
 
+$properties | ConvertTo-Json -Depth 2 | Out-File "data.json"
 
 while ($true) {
     Write-Host ""
