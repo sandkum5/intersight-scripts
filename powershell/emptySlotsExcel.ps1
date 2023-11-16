@@ -1,6 +1,6 @@
 <#
-    Print Empty Slots in UCSM Domains connected to Intersight
-    Prints all or Domain Specific Output
+    Get Empty Slots in UCSM Domains connected to Intersight
+    Write output to an Excel file with Empty slots background with Yellow color.
     Caveats:
         Doesn't take into consideration a full-width blade
 #>
