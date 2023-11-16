@@ -1,6 +1,8 @@
 <#
-    Get Empty Slots in UCSM Domains connected to Intersight
-    Write output to an Excel file with Empty slots background with Yellow color.
+    Print Empty Slots in UCSM Domains connected to Intersight
+    Prints all or Domain Specific Output
+    Install Module ImportExcel:
+        Cmd: Install-Module -Name ImportExcel
     Caveats:
         Doesn't take into consideration a full-width blade
 #>
@@ -80,6 +82,7 @@ foreach ($domain in $properties.GetEnumerator()) {
     }
 }
 
+# Write Rows to a csv file
 foreach ($row in $rows) {
     $domain = $row[0]
     $chassis = $row[1]
@@ -94,11 +97,11 @@ foreach ($row in $rows) {
     Add-Content "./emptySlots.csv" "$($domain),$($chassis),$($slot_1),$($slot_2),$($slot_3),$($slot_4),$($slot_5),$($slot_6),$($slot_7),$($slot_8)"
 }
 
+# Read CSV and Write to xlsx file
 $csvdata = Import-Csv "./emptySlots.csv"
-
 Export-Excel -InputObject $csvdata -Path "emptySlots.xlsx" -TableName RawData -WorksheetName RawData
 
-
+# Update xlsx with color coding Empty Slots
 try {
     # Import the module
     Import-Module ImportExcel
