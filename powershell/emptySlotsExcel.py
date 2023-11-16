@@ -70,33 +70,33 @@ for domain, chassis, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8 in (
     elif slot1 == "Equipped":
         worksheet.write_string(row, col+2, slot1, cell_format_red)
     if slot2 == "Available":
-        worksheet.write_string(row, col+3, slot1, cell_format_green)
+        worksheet.write_string(row, col+3, slot2, cell_format_green)
     elif slot2 == "Equipped":
-        worksheet.write_string(row, col+3, slot1, cell_format_red)
+        worksheet.write_string(row, col+3, slot2, cell_format_red)
     if slot3 == "Available":
-        worksheet.write_string(row, col+4, slot1, cell_format_green)
+        worksheet.write_string(row, col+4, slot3, cell_format_green)
     elif slot3 == "Equipped":
-        worksheet.write_string(row, col+4, slot1, cell_format_red)
+        worksheet.write_string(row, col+4, slot3, cell_format_red)
     if slot4 == "Available":
-        worksheet.write_string(row, col+5, slot1, cell_format_green)
+        worksheet.write_string(row, col+5, slot4, cell_format_green)
     elif slot4 == "Equipped":
-        worksheet.write_string(row, col+5, slot1, cell_format_red)
+        worksheet.write_string(row, col+5, slot4, cell_format_red)
     if slot5 == "Available":
-        worksheet.write_string(row, col+6, slot1, cell_format_green)
+        worksheet.write_string(row, col+6, slot5, cell_format_green)
     elif slot5 == "Equipped":
-        worksheet.write_string(row, col+6, slot1, cell_format_red)
+        worksheet.write_string(row, col+6, slot5, cell_format_red)
     if slot6 == "Available":
-        worksheet.write_string(row, col+7, slot1, cell_format_green)
+        worksheet.write_string(row, col+7, slot6, cell_format_green)
     elif slot6 == "Equipped":
-        worksheet.write_string(row, col+7, slot1, cell_format_red)
+        worksheet.write_string(row, col+7, slot6, cell_format_red)
     if slot7 == "Available":
-        worksheet.write_string(row, col+8, slot1, cell_format_green)
+        worksheet.write_string(row, col+8, slot7, cell_format_green)
     elif slot7 == "Equipped":
-        worksheet.write_string(row, col+8, slot1, cell_format_red)
+        worksheet.write_string(row, col+8, slot7, cell_format_red)
     if slot8 == "Available":
-        worksheet.write_string(row, col+9, slot1, cell_format_green)
+        worksheet.write_string(row, col+9, slot8, cell_format_green)
     elif slot8 == "Equipped":
-        worksheet.write_string(row, col+9, slot1, cell_format_red)
+        worksheet.write_string(row, col+9, slot8, cell_format_red)
     row += 1
 
 workbook.close()
