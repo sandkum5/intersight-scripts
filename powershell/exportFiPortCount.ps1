@@ -16,14 +16,8 @@
      Ref: https://www.cisco.com/c/en/us/support/docs/servers-unified-computing/ucs-infrastructure-ucs-manager-software/200638-Understanding-and-Troubleshooting-UCS-Li.html#anc9
 #>
 
-$ApiParams = @{
-    BasePath = "https://intersight.com"
-    ApiKeyId = Get-Content -Path ./apiKey.txt -Raw
-    ApiKeyFilePath = $pwd.Path + "/SecretKey.txt"
-    HttpSigningHeader = @("(request-target)", "Host", "Date", "Digest")
-}
-
-Set-IntersightConfiguration @ApiParams
+# Intersight Configuration
+. ./intersightAuth.ps1
 
 $InterSightFISummary = $Null
 $InterSightFISummary = Get-InterSightNetworkElementSummary | Select-Object Name, Model, Ipv4Address, Vendor, _Version, Moid, DeviceMoId, SwitchType, EthernetSwitchingMode, FcSwitchingMode, ManagementMode, Thermal, AdminEvacState, AdminInbandInterfaceState, Dn, EthernetMode, FaultSummary, FcMode, FirmwareVersion, NumEtherPorts, NumEtherPortsConfigured, NumEtherPortsLinkUp, NumExpansionModules, NumFcPorts, NumFcPortsConfigured, NumFcPortsLinkUp, OperEvacState, Operability, OutOfBandIpAddress, OutOfBandIpGateway, OutOfBandIpMask, OutOfBandIpv4Address, OutOfBandIpv4Gateway, OutOfBandIpv4Mask, OutOfBandMac, Serial, SwitchId, TotalMemory, CreateTime, DomainGroupMoid, ModTime
