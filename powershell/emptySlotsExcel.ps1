@@ -99,7 +99,8 @@ foreach ($row in $rows) {
 
 # Read CSV and Write to xlsx file
 $csvdata = Import-Csv "./emptySlots.csv"
-Export-Excel -InputObject $csvdata -Path "emptySlots.xlsx" -TableName EmptySlots -WorksheetName EmptySlots
+$sortedData = $csvdata | Sort-Object -Property {$_.DomainName,$_.ChassisId}
+Export-Excel -InputObject $sortedData -Path "emptySlots.xlsx" -TableName RawData -WorksheetName RawData
 
 # Update xlsx with color coding Empty Slots
 try {
