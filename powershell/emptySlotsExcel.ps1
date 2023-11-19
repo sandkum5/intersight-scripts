@@ -32,75 +32,58 @@ while ($count -le $totalCount)
     $count += 1000
 }
 
-#Create nested hashtable
-Write-Host "Parsing Intersight Data"
-$properties = @{}
-foreach ($Server in $ServerNames) {
+$myObj = [System.Collections.ArrayList]@()
+foreach ($server in $serverNames) {
     $x = $Server.Name | Select-String -Pattern "^(.+)-(\d+)-(\d)"
     $DomainName = $x.Matches.Groups[1].Value
     $ChassisId = $x.Matches.Groups[2].Value
     $ServerId = $x.Matches.Groups[3].Value
 
-    if ($properties.ContainsKey($DomainName)){
-    } else {
-        $properties.Add($DomainName, @{}) | Out-Null
+    $serverObj = [PSCustomObject]@{
+        "Domain" = $DomainName
+        "Chassis" = "Chassis_$($ChassisId)"
+        "Slot" = "Slot_$($ServerId)"
     }
-    if ($properties[$DomainName].ContainsKey($ChassisId)) {
-    } else {
-        $properties[$DomainName].Add($ChassisId, [System.Collections.ArrayList]@()) | Out-Null
-    }
-    $properties[$DomainName][$ChassisId].Add($ServerId) | Out-Null
+    $myObj += $serverObj
 }
 
-$properties | ConvertTo-Json -Depth 2 | Out-File "data.json"
-
-
-# Write to Excel File
-# Create a list of Rows for Excel file
-$rows = [System.Collections.ArrayList]@()
-
-# Excel Header Fields
-$fields = @("DomainName", "ChassisId", "Slot_1", "Slot_2", "Slot_3", "Slot_4", "Slot_5", "Slot_6", "Slot_7", "Slot_8")
-$rows.Add($fields) | Out-Null
-
-# Add Data rows to rows list
-foreach ($domain in $properties.GetEnumerator()) {
-    # Write-Host "$($domain.Name)"
-    foreach ($chassis in ($domain.Value).GetEnumerator()) {
-        $row = [System.Collections.ArrayList]@()
-        $row.Add($domain.Name) | Out-Null
-        $row.Add("Chassis_$($chassis.Name)") | Out-Null
-        $serverList = $($chassis.Value)
-        foreach ($server in 1..8) {
-            if ( $serverList -contains $server) {
-                $row.Add("Equipped") | Out-Null
+$mycustomObj = [System.Collections.ArrayList]@()
+$myDomains = $myObj.Domain | Sort-Object -Unique
+foreach ($domain in $myDomains) {
+    $domainInfo = $myObj | Where-Object {$_.Domain -eq $domain}
+    $chassisNames = $domainInfo.Chassis | Sort-Object -Unique
+    foreach ($chassis in $chassisNames) {
+        $chassisInfo = $domainInfo | Where-Object {$_.Chassis -eq $chassis}
+        $equippedSlots = $ChassisInfo.Slot | Sort-Object
+        $slotDict = @{}
+        foreach ($slot in ('Slot_1', 'Slot_2', 'Slot_3', 'Slot_4', 'Slot_5', 'Slot_6', 'Slot_7', 'Slot_8')){
+            if ($slot -in $equippedSlots){
+                $slotDict.Add($slot, "Equipped")
             } else {
-                $row.Add("Available") | Out-Null
+                $slotDict.Add($slot,"Available")
             }
         }
-        $rows.Add($row) | Out-Null
+        $domainObj = [pscustomobject]@{
+            "Domain" = $domain
+            "Chassis" = $chassis
+            "Slot_1" = $slotDict.Slot_1
+            "Slot_2" = $slotDict.Slot_2
+            "Slot_3" = $slotDict.Slot_3
+            "Slot_4" = $slotDict.Slot_4
+            "Slot_5" = $slotDict.Slot_5
+            "Slot_6" = $slotDict.Slot_6
+            "Slot_7" = $slotDict.Slot_7
+            "Slot_8" = $slotDict.Slot_8
+        }
+        $mycustomObj += $domainObj
     }
 }
 
-# Write Rows to a csv file
-foreach ($row in $rows) {
-    $domain = $row[0]
-    $chassis = $row[1]
-    $slot_1 = $row[2]
-    $slot_2 = $row[3]
-    $slot_3 = $row[4]
-    $slot_4 = $row[5]
-    $slot_5 = $row[6]
-    $slot_6 = $row[7]
-    $slot_7 = $row[8]
-    $slot_8 = $row[9]
-    Add-Content "./emptySlots.csv" "$($domain),$($chassis),$($slot_1),$($slot_2),$($slot_3),$($slot_4),$($slot_5),$($slot_6),$($slot_7),$($slot_8)"
-}
+# Write to csv
+# $mycustomObj | Export-Csv 'emptySlots.csv'
 
-# Read CSV and Write to xlsx file
-$csvdata = Import-Csv "./emptySlots.csv"
-$sortedData = $csvdata | Sort-Object -Property {$_.DomainName,$_.ChassisId}
-Export-Excel -InputObject $sortedData -Path "emptySlots.xlsx" -TableName RawData -WorksheetName RawData
+# Write to xlsx file
+Export-Excel -InputObject $mycustomObj -Path "emptySlotsv3.xlsx" -TableName RawData -WorksheetName RawData
 
 # Update xlsx with color coding Empty Slots
 try {
@@ -108,7 +91,7 @@ try {
     Import-Module ImportExcel
 
     # Open excel file
-    $excel = Open-ExcelPackage -Path "./emptySlots.xlsx"
+    $excel = Open-ExcelPackage -Path "./emptySlotsv3.xlsx"
 
     # Get Active worksheet
     $activeSheet = $excel.Workbook.View.ActiveTab
@@ -116,11 +99,12 @@ try {
     # Set cell's background color
     foreach ($cell in $excel.Workbook.Worksheets[$activeSheet + 1].Cells.GetEnumerator()) {
         if ($cell.Value -eq "Available") {
-            $excel.Workbook.Worksheets[$activeSheet + 1].Cells["$($cell.Address)"].Style.Fill.PatternType = [ExcelFillStyle]::Solid
+            $excel.Workbook.Worksheets[$activeSheet + 1].Cells["$($cell.Address)"].Style.Fill.PatternType = [OfficeOpenXml.Style.ExcelFillStyle]::Solid
             $excel.Workbook.Worksheets[$activeSheet + 1].Cells["$($cell.Address)"].Style.Fill.BackgroundColor.SetColor("Yellow")
         }
         if ($cell.Value -eq "Equipped") {
-            $excel.Workbook.Worksheets[$activeSheet + 1].Cells["$($cell.Address)"].Style.Fill.PatternType = [ExcelFillStyle]::Solid
+            $excel.Workbook.Worksheets[$activeSheet + 1].Cells["$($cell.Address)"].Style.Fill.PatternType = [OfficeOpenXml.Style.ExcelFillStyle]::Solid
+            # $excel.Workbook.Worksheets[$activeSheet + 1].Cells["$($cell.Address)"].Style.Fill.PatternType = [ExcelFillStyle]::Solid
             $excel.Workbook.Worksheets[$activeSheet + 1].Cells["$($cell.Address)"].Style.Fill.BackgroundColor.SetColor("White")
         }
     }
