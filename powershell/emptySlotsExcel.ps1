@@ -83,7 +83,7 @@ foreach ($domain in $myDomains) {
 # $mycustomObj | Export-Csv 'emptySlots.csv'
 
 # Write to xlsx file
-Export-Excel -InputObject $mycustomObj -Path "emptySlotsv3.xlsx" -TableName RawData -WorksheetName RawData
+Export-Excel -InputObject $mycustomObj -Path "emptySlots.xlsx" -TableName RawData -WorksheetName RawData
 
 # Update xlsx with color coding Empty Slots
 try {
@@ -91,7 +91,7 @@ try {
     Import-Module ImportExcel
 
     # Open excel file
-    $excel = Open-ExcelPackage -Path "./emptySlotsv3.xlsx"
+    $excel = Open-ExcelPackage -Path "./emptySlots.xlsx"
 
     # Get Active worksheet
     $activeSheet = $excel.Workbook.View.ActiveTab
