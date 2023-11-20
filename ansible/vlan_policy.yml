@@ -101,6 +101,7 @@
     - name: Print data
       debug:
         msg: "{{ jsondata }}"
+
     # Add VLANs
     - name: "Add VLANs using Loop"
       intersight_rest_api:
@@ -109,9 +110,10 @@
         api_body: {
           "Verb": "POST",
           "Uri": "/v1/fabric/Vlans",
-          "Requests": "{{ jsondata }}"
+          "Requests": "{{ item }}"
         }
       register: bulk_vlan_info
+      loop: "{{ jsondata | from_json | batch(100) }}"
 
     - name: Print return information from the previous task
       ansible.builtin.debug:
