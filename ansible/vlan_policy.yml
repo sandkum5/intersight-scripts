@@ -88,7 +88,7 @@
         vlans: "{{ csv_output.list[1:] }}"
       ansible.builtin.template:
         src: ./vlan_data.j2
-        dest: ./data.yml
+        dest: ./vlan_data.yml
 
     - name: Read YAML File
       shell: cat vlan_data.yml
