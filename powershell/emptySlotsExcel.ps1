@@ -1,6 +1,6 @@
 <#
-    Print Empty Slots in UCSM Domains connected to Intersight
-    Prints all or Domain Specific Output
+    Get Empty Slots in UCSM Domains connected to Intersight
+    Write Empty Slots info to an Excel with color coding
     Install Module ImportExcel:
         Cmd: Install-Module -Name ImportExcel
     Caveats:
