@@ -715,7 +715,21 @@ switch ($value) {
         Invoke-GetServerInventory -Server $Server
     }
     "all" {
-        $Servers = (Get-IntersightComputePhysicalSummary -Top 1000).Results
+        $Servers = [System.Collections.ArrayList]@()
+        $skip = 0
+        $count = 0
+        $totalCount = (Get-IntersightComputePhysicalSummary -Count $true).Count
+        
+        Write-Host 'API call to Intersight In-progress, 1 API call/1000 objects'
+        while ($count -le $totalCount){
+            $loop = ($count / 1000) + 1
+            Write-Host "$($loop) API Call!"
+            $Servers += (Get-IntersightComputePhysicalSummary -Top 1000 -Skip $skip).Results
+            $skip += 1000
+            $count += 1000
+        }
+
+        # $Servers = (Get-IntersightComputePhysicalSummary -Top 1000).Results
         $Data = @{}
         foreach ($Server in $Servers) {
             Invoke-GetServerInventory -Server $Server
