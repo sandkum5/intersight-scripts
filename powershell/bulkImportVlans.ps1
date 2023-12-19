@@ -35,13 +35,14 @@ Function Invoke-AddVLANs {
                 }
             }
             # Add VLAN to the VLAN Policy
-            $additionalProps = Initialize-IntersightFabricVlan -Name $vlanName -VlanId $vlanId -EthNetworkPolicy $ethNetworkPolicyRel -MulticastPolicy $multicastPolicyRel -SharingType $SharingType -AutoAllowOnUplinks $AutoAllowOnUplinks -PrimaryVlanId $PrimaryVlanId -IsNative $IsNative
+            $additionalProps = Initialize-IntersightFabricVlan -Name $vlanName -VlanId $vlanId -EthNetworkPolicy $ethNetworkPolicyRel -SharingType $SharingType -AutoAllowOnUplinks $AutoAllowOnUplinks -PrimaryVlanId $PrimaryVlanId -IsNative $IsNative
+            # -MulticastPolicy $multicastPolicyRel 
             $additionalPropsObj = New-Object System.Collections.Generic.Dictionary"[String,Object]"
             $additionalPropsObj.Add("Body",$additionalProps)
             $request += Initialize-IntersightBulkSubRequest -Verb "POST" -Uri "/v1/fabric/Vlans" -AdditionalProperties $additionalPropsObj
 
         } elseif ($SharingType -in ("Primary")) {
-            $additionalProps = Initialize-IntersightFabricVlan -Name $vlanName -VlanId $vlanId -EthNetworkPolicy $ethNetworkPolicyRel -MulticastPolicy $multicastPolicyRel -SharingType $SharingType -AutoAllowOnUplinks $AutoAllowOnUplinks -PrimaryVlanId 0 -IsNative $IsNative
+            $additionalProps = Initialize-IntersightFabricVlan -Name $vlanName -VlanId $vlanId -EthNetworkPolicy $ethNetworkPolicyRel -SharingType $SharingType -AutoAllowOnUplinks $AutoAllowOnUplinks -PrimaryVlanId 0 -IsNative $IsNative
             $additionalPropsObj = New-Object System.Collections.Generic.Dictionary"[String,Object]"
             $additionalPropsObj.Add("Body",$additionalProps)
             $request += Initialize-IntersightBulkSubRequest -Verb "POST" -Uri "/v1/fabric/Vlans" -AdditionalProperties $additionalPropsObj
