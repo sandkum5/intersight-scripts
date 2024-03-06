@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
     Intersight API calls to Update User Custom Views using userpreferences.json file generated using getUserPreferences.py script
+    Note: User must be logged out from Intersight GUI before running this script
 """
 
 import sys
