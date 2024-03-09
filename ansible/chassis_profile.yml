@@ -1,0 +1,96 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    api_info: &api_info
+      api_private_key: "{{ api_private_key }}"
+      api_key_id: "{{ api_key_id }}"
+      api_uri: "https://intersight.com/api/v1"
+      validate_certs: "{{ validate_certs }}"
+      state: present
+    org_name: "default"
+    imc_access_name: "demoX"
+    thermal_name: "demoX"
+  tasks:
+  # Get Org Info
+  - name: Get Organization Info
+    cisco.intersight.intersight_rest_api:
+      <<: *api_info
+      resource_path: /organization/Organizations
+      query_params:
+        $filter: "Name eq '{{ org_name }}'"
+    register: org_info
+
+  - name: Print Organization Moid from previous task
+    ansible.builtin.debug:
+      var: org_info.api_response.Moid
+
+  # Create Chassis Profile
+  - name: Create Chassis Profile
+    cisco.intersight.intersight_rest_api:
+      <<: *api_info
+      resource_path: /chassis/Profiles
+      api_body: {
+        "Organization": {
+            "ObjectType": "organization.Organization",
+            "Moid": "{{ org_info.api_response.Moid }}"
+        },
+        "Name": "ansible_demoX"
+      }
+      state: present
+    register: chassis_profile_X
+
+  - name: Print Chassis Profile Moid
+    ansible.builtin.debug:
+      var: chassis_profile_X.api_response
+
+  # Get IMC Access Policy Info
+  - name: Get IMC Access Policy
+    cisco.intersight.intersight_rest_api:
+      <<: *api_info
+      resource_path: "/access/Policies"
+      query_params:
+        $filter: "Name eq '{{ imc_access_name }}'"
+    register: imc_access_X
+
+  - name: Print IMC Access Policy
+    ansible.builtin.debug:
+      var: imc_access_X.api_response
+
+  # Get Thermal Policy Info
+  - name: Get Thermal Policy
+    cisco.intersight.intersight_rest_api:
+      <<: *api_info
+      resource_path: "/thermal/Policies"
+      query_params:
+        $filter: "Name eq '{{ thermal_name }}'"
+    register: thermal_X
+
+  - name: Print Thermal Policy
+    ansible.builtin.debug:
+      var: thermal_X.api_response
+
+  # Add IMC Access and Thermal Policy to the Chassis Profile
+  - name: Create Chassis Profile
+    cisco.intersight.intersight_rest_api:
+      <<: *api_info
+      resource_path: "/chassis/Profiles/{{ chassis_profile_X.api_response.Moid }}"
+      api_body: {
+        "PolicyBucket": [
+          {
+            "ObjectType": "access.Policy",
+            "Moid": "{{ imc_access_X.api_response.Moid }}"
+          },
+          {
+            "ObjectType": "thermal.Policy",
+            "Moid": "{{ thermal_X.api_response.Moid }}"
+          }
+        ]
+      }
+      state: present
+    register: chassis_profile_X_update
+
+  - name: Print Updated Chassis Profile
+    ansible.builtin.debug:
+      var: chassis_profile_X_update.api_response
