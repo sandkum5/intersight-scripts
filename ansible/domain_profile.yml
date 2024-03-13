@@ -1,0 +1,144 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    api_info: &api_info
+      api_private_key: "{{ api_private_key }}"
+      api_key_id: "{{ api_key_id }}"
+      api_uri: "https://intersight.com/api/v1"
+      validate_certs: "{{ validate_certs }}"
+      state: present
+    org_name: "default"
+    domain_profile_name: "ansible_demoX"
+    vlan_policy_name: "demoX"
+  tasks:
+  # Get Org Info
+  - name: Get Organization Info
+    cisco.intersight.intersight_rest_api:
+      <<: *api_info
+      resource_path: /organization/Organizations
+      query_params:
+        $filter: "Name eq '{{ org_name }}'"
+    register: org_info
+
+  - name: Print Organization Moid
+    ansible.builtin.debug:
+      var: org_info.api_response.Moid
+
+  # Create Domain Cluster Profile
+  - name: Create Domain Cluster Profile
+    cisco.intersight.intersight_rest_api:
+      <<: *api_info
+      resource_path: /fabric/SwitchClusterProfiles
+      api_body: {
+        "Organization": {
+            "ObjectType": "organization.Organization",
+            "Moid": "{{ org_info.api_response.Moid }}"
+        },
+        "Name": "{{ domain_profile_name }}"
+      }
+      state: present
+    register: domain_profile_X
+
+  - name: Print Domain Profile Moid
+    ansible.builtin.debug:
+      var: domain_profile_X.api_response.Moid
+
+
+  # Get Domain Switch-A Profile
+  - name: Create Domain Switch-A Profile
+    cisco.intersight.intersight_rest_api:
+      <<: *api_info
+      resource_path: /fabric/SwitchProfiles
+      api_body: {
+        "SwitchClusterProfile": "{{ domain_profile_X.api_response.Moid }}",
+        "Name": "{{ domain_profile_name }}-A"
+      }
+      state: present
+      update_method: "post"
+    register: domain_profile_XA
+
+  - name: Print Domain Switch-A Profile Moid
+    ansible.builtin.debug:
+      var: domain_profile_XA.api_response.Moid
+
+  - name: Print Domain Switch-A Profile Name
+    ansible.builtin.debug:
+      var: domain_profile_XA.api_response.Name
+
+  # Create Domain Switch-B Profile
+  - name: Create Domain Switch-B Profile
+    cisco.intersight.intersight_rest_api:
+      <<: *api_info
+      resource_path: /fabric/SwitchProfiles
+      api_body: {
+        "SwitchClusterProfile": "{{ domain_profile_X.api_response.Moid }}",
+        "Name": "{{ domain_profile_name }}-B"
+      }
+      state: present
+      update_method: "post"
+    register: domain_profile_XB
+
+  - name: Print Domain Switch-B Profile Moid
+    ansible.builtin.debug:
+      var: domain_profile_XB.api_response.Moid
+
+  - name: Print Domain Switch-B Profile Name
+    ansible.builtin.debug:
+      var: domain_profile_XB.api_response.Name
+
+
+  # Get VLAN Policy Info
+  - name: Get VLAN Policy
+    cisco.intersight.intersight_rest_api:
+      <<: *api_info
+      resource_path: "/fabric/EthNetworkPolicies"
+      query_params:
+        $filter: "Name eq '{{ vlan_policy_name }}'"
+    register: vlan_policy_X
+
+  - name: Print VLAN Policy
+    ansible.builtin.debug:
+      var: vlan_policy_X.api_response.Moid
+
+
+  # Add VLAN Policy to the Domain Switch-A Profile
+  - name: Add VLAN Policy to Domain Switch-A Profile
+    cisco.intersight.intersight_rest_api:
+      <<: *api_info
+      resource_path: "/fabric/SwitchProfiles/{{ domain_profile_XA.api_response.Moid }}"
+      api_body: {
+        "PolicyBucket": [
+          {
+            "ObjectType": "fabric.EthNetworkPolicy",
+            "Moid": "{{ vlan_policy_X.api_response.Moid }}"
+          }
+        ]
+      }
+      state: present
+    register: domain_profile_XA_update
+
+  - name: Print Updated Domain Switch-A Profile
+    ansible.builtin.debug:
+      var: domain_profile_XA_update.api_response
+
+  # Add VLAN Policy to the Domain Switch-B Profile
+  - name: Add VLAN Policy to Domain Switch-B Profile
+    cisco.intersight.intersight_rest_api:
+      <<: *api_info
+      resource_path: "/fabric/SwitchProfiles/{{ domain_profile_XB.api_response.Moid }}"
+      api_body: {
+        "PolicyBucket": [
+          {
+            "ObjectType": "fabric.EthNetworkPolicy",
+            "Moid": "{{ vlan_policy_X.api_response.Moid }}"
+          }
+        ]
+      }
+      state: present
+    register: domain_profile_XB_update
+
+  - name: Print Updated Domain Switch-B Profile
+    ansible.builtin.debug:
+      var: domain_profile_XB_update.api_response
