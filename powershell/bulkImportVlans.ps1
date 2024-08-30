@@ -67,6 +67,7 @@ $ApiParams = @{
     ApiKeyFilePath       = "/Path/To/SecretKey.txt"                         # Update
     HttpSigningHeader    = @("(request-target)", "Host", "Date", "Digest")
     SkipCertificateCheck = $false
+    SignatureValidityPeriod = 0
 }
 
 Set-IntersightConfiguration @ApiParams
