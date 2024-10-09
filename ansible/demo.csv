@@ -2,4 +2,4 @@ Name,ID,Type,Transport,Native,VLAN Sharing,Primary VLAN Name,Multicast Policy Na
 default (1),1,Lan,Ether,Yes,None,,
 VLAN_1144,1144,Lan,Ether,No,None,,
 VLAN_1217,1217,Lan,Ether,No,None,,
-VLAN_1304,1304,Lan,Ether,No,None,
+VLAN_1304,1304,Lan,Ether,No,None,,
