@@ -1,3 +1,12 @@
+<#
+    Script to get VNIC information
+    Creats an excel with following keys as columns:
+      Name, MacAddress, VethId, StandbyVifId, FailoverEnabled, AllowedVlans, NativeVlan, SwitchId, PCIeId, 
+      AdapterUplink, Mtu, Priority, Cos, ServerProfile, ServerName, ServerModel, ServerSerial, LanConnPolicy, 
+      VethOperState, VethOperReason, VethBoundInterfaceDn, VethPinnedInterfaceDn, FiSwitchProfileName, FiSwitchId, 
+      FiModel, FiSerial, FiAdminEvacState, FiOperEvacState, FiOperability, FiManagementMode
+#>
+
 $ApiParams = @{
     BasePath = "https://intersight.com"
     ApiKeyId = Get-Content -Path ./apiKey.txt -Raw
