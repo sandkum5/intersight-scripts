@@ -1,5 +1,9 @@
 <#
-  
+    Script to get VHBA information
+    Creats an excel with following keys as columns:
+      Name, Wwpn, VfcId, VhbaType, SwitchId, PCIeId, AdapterUplink, ServerProfile, ServerName, ServerModel, ServerSerial, SanConnPolicy, 
+      VfcDescription, VfcBoundInterfaceDn, VfcPinnedInterfaceDn, VfcOperState, VfcOperReason, FiSwitchProfileName, FiSwitchId, FiModel, 
+      FiSerial, FiAdminEvacState, FiOperEvacState, FiOperability, FiManagementMode
 #>
 
 $ApiParams = @{
@@ -21,9 +25,7 @@ while ($count -le $totalCount)
 {
     $vfcData = (Get-IntersightNetworkVfc -Top 1000 -Skip $skip -Expand 'NetworkElement($select=SwitchProfileName,Serial,SwitchId,Model,ManagementMode,Operability,AdminEvacState,OperEvacState)' -Select 'VfcId,Description,BoundInterfaceDn,PinnedInterfaceDn,OperState,OperReason,NetworkElement').Results
 
-    #Create an empty array in the variable $vnicArray we'll add the objects to
     [System.Collections.ArrayList]$vfcArray = @()
-    #Iterate through each vnic in $vnics with a ForEach loop
     ForEach($data in $vfcData) {
         $fiData = $data.NetworkElement.ActualInstance
         $dataObject = [PSCustomObject]@{
@@ -59,9 +61,7 @@ while ($count -le $totalCount)
 {
     $vhbaData = (Get-IntersightVnicFcIf -Top 1000 -Skip $skip -Filter "ScpVhba ne 'null'" -Select "Name,Wwpn,VifId,Order,Type,Placement,Profile,ScpVhba" -Expand 'Profile($select=Name,AssociatedServer;$expand=AssociatedServer($select=Name,Model,Serial)),ScpVhba($select=SanConnectivityPolicy;$expand=SanConnectivityPolicy($select=Name))').Results
 
-    #Create an empty array in the variable $vnicArray we'll add the objects to
     [System.Collections.ArrayList]$vhbaArray = @()
-    #Iterate through each vnic in $vnics with a ForEach loop
     ForEach($data in $vhbaData) {
         $dataObject = [PSCustomObject]@{
             Name          = $data.Name
