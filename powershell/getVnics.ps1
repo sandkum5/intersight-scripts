@@ -26,9 +26,7 @@ while ($count -le $totalCount)
 {
     $vethData = (Get-IntersightNetworkVethernet -Top 1000 -Skip $skip -Expand 'NetworkElement($select=SwitchProfileName,Serial,SwitchId,Model,ManagementMode,Operability,AdminEvacState,OperEvacState)' -Select 'VethId,Description,BoundInterfaceDn,NetworkElement,OperState,OperReason,PinnedInterfaceDn').Results
 
-    #Create an empty array in the variable $vnicArray we'll add the objects to
     [System.Collections.ArrayList]$vethArray = @()
-    #Iterate through each vnic in $vnics with a ForEach loop
     ForEach($data in $vethData) {
         $fiData = $data.NetworkElement.ActualInstance
         $dataObject = [PSCustomObject]@{
@@ -62,9 +60,7 @@ while ($count -le $totalCount)
 {
     $vnicData = (Get-IntersightVnicEthIf -Top 1000 -Skip $skip -Filter "LcpVnic ne 'null'" -Select "Name,MacAddress,FailoverEnabled,VifId,StandbyVifId,Placement,Profile,EthQosPolicy,FabricEthNetworkGroupPolicy,LcpVnic" -Expand 'Profile($select=Name,AssociatedServer;$expand=AssociatedServer($select=Name,Model,Serial)),EthQosPolicy($select=Mtu,Cos,Priority),FabricEthNetworkGroupPolicy($select=VlanSettings),LcpVnic($select=LanConnectivityPolicy;$expand=LanConnectivityPolicy($select=Name))').Results
 
-    #Create an empty array in the variable $vnicArray we'll add the objects to
     [System.Collections.ArrayList]$vnicArray = @()
-    #Iterate through each vnic in $vnics with a ForEach loop
     ForEach($data in $vnicData) {
         $dataObject = [PSCustomObject]@{
             Name = $data.Name
