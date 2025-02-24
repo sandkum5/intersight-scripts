@@ -2,10 +2,8 @@
     Script to get FI Local Storage Utilization 
     Useful before Firmware Upgrades. 
     Usage: Find high storage uitlization and bring it below a certain threshold before upgrade.
-    
     GUI Location: Intersight GUI > Operate > Fabric Interconnects > Select FI > Inventory > Local Storage
 #>
-
 
 $ApiParams = @{
     BasePath = "https://intersight.com"
@@ -29,11 +27,11 @@ while ($count -le $totalCount)
     foreach ($fi in $FiData) {
         $dataObject = [PSCustomObject]@{
             DeviceHostname = $fi.RegisteredDevice.ActualInstance.DeviceHostname[0]
+            SwitchId       = $fi.NetworkElement.ActualInstance.SwitchId
             Model          = $fi.NetworkElement.ActualInstance.Model
             Serial         = $fi.NetworkElement.ActualInstance.Serial
-            Dn             = $fi.NetworkElement.ActualInstance.Dn
             DeviceMoId     = $fi.DeviceMoId
-            Dir_Dn         = $fi.Dn
+            # Dir_Dn         = $fi.Dn
             Dir_Name       = $fi.Name
             Dir_Size       = $fi.Size
             Dir_Used       = $fi.Used
