@@ -15,9 +15,9 @@ $count=0
 $totalCount = (Get-IntersightComputeBlade -Filter "Model eq '$($BladeModel)'").Results.Count
 if ($totalCount) {
     while ($count -le $totalCount) {
-        $bladeData = (Get-IntersightComputeBlade -Top 0 -Skip $skip -Filter "Model eq '$($BladeModel)'").Results | Select-Object Name,Serial,Model,Moid,Tags
-        $skip += 100
-        $count += 100
+        $bladeData = (Get-IntersightComputeBlade -Top 1000 -Skip $skip -Filter "Model eq '$($BladeModel)'").Results | Select-Object Name,Serial,Model,Moid,Tags
+        $skip += 1000
+        $count += 1000
         foreach ($server in $bladeData) {
             # Initialize tags
             $update = $true
@@ -54,9 +54,9 @@ $count=0
 $totalCount = (Get-IntersightComputeRackUnit -Filter "Model eq '$($RackModel)'").Results.Count
 if ($totalCount) {
     while ($count -le $totalCount) {
-        $Data = (Get-IntersightComputeRackUnit -Top 0 -Skip $skip -Filter "Model eq '$($RackModel)'").Results | Select-Object Name,Serial,Model,Moid,Tags
-        $skip += 100
-        $count += 100
+        $Data = (Get-IntersightComputeRackUnit -Top 1000 -Skip $skip -Filter "Model eq '$($RackModel)'").Results | Select-Object Name,Serial,Model,Moid,Tags
+        $skip += 1000
+        $count += 1000
         foreach ($server in $Data) {
             # Initialize tags
             $update = $true
